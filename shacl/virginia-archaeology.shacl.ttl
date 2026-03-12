@@ -1,0 +1,532 @@
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix crm:   <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix crmsci: <http://www.ics.forth.gr/isl/CRMsci/> .
+@prefix va:    <http://example.org/virginia-archaeology/> .
+
+# =============================================================================
+# Virginia Native Peoples Archaeology — SHACL Schema
+# Adapted from OpenArchaeo-Shapes.ttl (CIDOC-CRM / CRMarchaeo / CRMsci)
+# Simplified for labeled property graph (Neo4j) usage with graphlint
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Site (CIDOC-CRM E27_Site)
+# An archaeological site — e.g., Cactus Hill, Werowocomoco, Thunderbird
+# -----------------------------------------------------------------------------
+va:SiteShape a sh:NodeShape ;
+    sh:targetClass crm:E27_Site ;
+    rdfs:label "Archaeological Site" ;
+    rdfs:comment "An identified archaeological site in Virginia" ;
+    sh:order 1 ;
+
+    # Required: a human-readable name
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        rdfs:comment "Site must have exactly one name"
+    ] ;
+
+    # Optional: descriptive notes
+    sh:property [
+        sh:path crm:P3_has_note ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        rdfs:comment "Free-text description of the site"
+    ] ;
+
+    # Optional: location reference (Place node)
+    sh:property [
+        sh:path crm:P53_has_former_or_current_location ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E53_Place ;
+        sh:maxCount 1 ;
+        rdfs:comment "Geographic location of the site"
+    ] ;
+
+    # Optional: documented in source material
+    sh:property [
+        sh:path crm:P70i_is_documented_in ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E31_Document ;
+        rdfs:comment "Source document(s) that reference this site"
+    ] ;
+
+    # Optional: associated time period
+    sh:property [
+        sh:path crm:P4_has_time-span ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E52_Time-Span ;
+        rdfs:comment "Cultural period(s) associated with this site"
+    ] ;
+
+    # Optional: associated group (tribe/nation)
+    sh:property [
+        sh:path va:has_cultural_affiliation ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E74_Group ;
+        rdfs:comment "Tribe, nation, or cultural group associated with the site"
+    ] .
+
+
+# -----------------------------------------------------------------------------
+# Group (CIDOC-CRM E74_Group)
+# A people, tribe, nation, or confederacy — e.g., Powhatan, Monacan, Nottoway
+# NOT in original OpenArchaeo — added for Virginia Native Peoples domain
+# -----------------------------------------------------------------------------
+va:GroupShape a sh:NodeShape ;
+    sh:targetClass crm:E74_Group ;
+    rdfs:label "Cultural Group" ;
+    rdfs:comment "A tribe, nation, confederacy, or cultural group" ;
+    sh:order 2 ;
+
+    # Required: group name
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        rdfs:comment "Group must have exactly one name"
+    ] ;
+
+    # Optional: descriptive notes
+    sh:property [
+        sh:path crm:P3_has_note ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        rdfs:comment "Description of the group"
+    ] ;
+
+    # Optional: group type (tribe, confederacy, band, etc.)
+    sh:property [
+        sh:path crm:P2_has_type ;
+        sh:datatype xsd:string ;
+        sh:in ( "tribe" "confederacy" "nation" "band" "chiefdom" "linguistic group" ) ;
+        sh:maxCount 1 ;
+        rdfs:comment "Classification of the group"
+    ] ;
+
+    # Optional: territory / place association
+    sh:property [
+        sh:path crm:P53_has_former_or_current_location ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E53_Place ;
+        rdfs:comment "Territory or homeland of the group"
+    ] ;
+
+    # Optional: part-of relationship (e.g., Pamunkey part of Powhatan Confederacy)
+    sh:property [
+        sh:path crm:P107i_is_current_or_former_member_of ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E74_Group ;
+        rdfs:comment "Parent group (e.g., confederacy this tribe belongs to)"
+    ] ;
+
+    # Optional: associated time period
+    sh:property [
+        sh:path crm:P4_has_time-span ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E52_Time-Span ;
+        rdfs:comment "Time period(s) this group is associated with"
+    ] ;
+
+    # Optional: documented in source material
+    sh:property [
+        sh:path crm:P70i_is_documented_in ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E31_Document ;
+        rdfs:comment "Source document(s) that reference this group"
+    ] .
+
+
+# -----------------------------------------------------------------------------
+# Person (CIDOC-CRM E21_Person)
+# A historical or archaeological figure — e.g., Wahunsenacah, John Smith
+# -----------------------------------------------------------------------------
+va:PersonShape a sh:NodeShape ;
+    sh:targetClass crm:E21_Person ;
+    rdfs:label "Person" ;
+    rdfs:comment "A historical person referenced in the source material" ;
+    sh:order 3 ;
+
+    # Required: person name
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        rdfs:comment "Person must have exactly one name"
+    ] ;
+
+    # Optional: descriptive notes
+    sh:property [
+        sh:path crm:P3_has_note ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        rdfs:comment "Description or biographical note"
+    ] ;
+
+    # Optional: membership in a group
+    sh:property [
+        sh:path crm:P107i_is_current_or_former_member_of ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E74_Group ;
+        rdfs:comment "Group this person belongs to"
+    ] ;
+
+    # Optional: documented in source material
+    sh:property [
+        sh:path crm:P70i_is_documented_in ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E31_Document ;
+        rdfs:comment "Source document(s) that reference this person"
+    ] .
+
+
+# -----------------------------------------------------------------------------
+# ManMadeObject (CIDOC-CRM E22_Man-Made_Object)
+# An artifact — e.g., Clovis point, ceramic sherd, shell gorget
+# -----------------------------------------------------------------------------
+va:ManMadeObjectShape a sh:NodeShape ;
+    sh:targetClass crm:E22_Man-Made_Object ;
+    rdfs:label "Artifact" ;
+    rdfs:comment "A human-made object found at a site" ;
+    sh:order 4 ;
+
+    # Required: object name or description
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        rdfs:comment "Artifact must have exactly one name"
+    ] ;
+
+    # Optional: descriptive notes
+    sh:property [
+        sh:path crm:P3_has_note ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        rdfs:comment "Description of the artifact"
+    ] ;
+
+    # Optional: general use / function
+    sh:property [
+        sh:path crm:P101_had_as_general_use ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        rdfs:comment "Functional classification (e.g., tool, weapon, ornament)"
+    ] ;
+
+    # Optional: material composition
+    sh:property [
+        sh:path crm:P45_consists_of ;
+        sh:datatype xsd:string ;
+        rdfs:comment "Material(s) the artifact is made from (e.g., rhyolite, ceramic)"
+    ] ;
+
+    # Optional: found at site
+    sh:property [
+        sh:path crm:P53_has_former_or_current_location ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E27_Site ;
+        sh:maxCount 1 ;
+        rdfs:comment "Site where this artifact was found"
+    ] ;
+
+    # Optional: associated time period
+    sh:property [
+        sh:path crm:P4_has_time-span ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E52_Time-Span ;
+        rdfs:comment "Time period this artifact dates to"
+    ] ;
+
+    # Optional: documented in source material
+    sh:property [
+        sh:path crm:P70i_is_documented_in ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E31_Document ;
+        rdfs:comment "Source document(s) that reference this artifact"
+    ] .
+
+
+# -----------------------------------------------------------------------------
+# Event (CIDOC-CRM E5_Event)
+# A historical event — e.g., English contact, migration, battle
+# -----------------------------------------------------------------------------
+va:EventShape a sh:NodeShape ;
+    sh:targetClass crm:E5_Event ;
+    rdfs:label "Event" ;
+    rdfs:comment "A historical or archaeological event" ;
+    sh:order 5 ;
+
+    # Required: event name or description
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        rdfs:comment "Event must have exactly one name"
+    ] ;
+
+    # Optional: descriptive notes
+    sh:property [
+        sh:path crm:P3_has_note ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        rdfs:comment "Description of the event"
+    ] ;
+
+    # Optional: event type
+    sh:property [
+        sh:path crm:P2_has_type ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        rdfs:comment "Classification of the event (e.g., migration, conflict, trade)"
+    ] ;
+
+    # Required: where the event took place
+    sh:property [
+        sh:path crm:P8_took_place_on_or_within ;
+        sh:nodeKind sh:IRI ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation ;
+        rdfs:comment "Event must be linked to at least one location (Site or Place)"
+    ] ;
+
+    # Required: when the event occurred
+    sh:property [
+        sh:path crm:P4_has_time-span ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E52_Time-Span ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        rdfs:comment "Event must have exactly one time span"
+    ] ;
+
+    # Optional: participants
+    sh:property [
+        sh:path crm:P11_had_participant ;
+        sh:nodeKind sh:IRI ;
+        rdfs:comment "Person(s) or group(s) that participated in the event"
+    ] ;
+
+    # Optional: documented in source material
+    sh:property [
+        sh:path crm:P70i_is_documented_in ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E31_Document ;
+        rdfs:comment "Source document(s) that reference this event"
+    ] .
+
+
+# -----------------------------------------------------------------------------
+# Place (CIDOC-CRM E53_Place)
+# A geographic location — e.g., Shenandoah Valley, James River, Tidewater
+# -----------------------------------------------------------------------------
+va:PlaceShape a sh:NodeShape ;
+    sh:targetClass crm:E53_Place ;
+    rdfs:label "Place" ;
+    rdfs:comment "A geographic location or region" ;
+    sh:order 6 ;
+
+    # Required: place name
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        rdfs:comment "Place must have exactly one name"
+    ] ;
+
+    # Optional: descriptive notes
+    sh:property [
+        sh:path crm:P3_has_note ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        rdfs:comment "Description of the place"
+    ] ;
+
+    # Optional: place type
+    sh:property [
+        sh:path crm:P2_has_type ;
+        sh:datatype xsd:string ;
+        sh:in ( "river" "valley" "mountain" "region" "bay" "island" "piedmont" "coastal plain" ) ;
+        sh:maxCount 1 ;
+        rdfs:comment "Geographic classification"
+    ] ;
+
+    # Optional: contained within a larger place
+    sh:property [
+        sh:path crm:P89_falls_within ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E53_Place ;
+        sh:maxCount 1 ;
+        rdfs:comment "Larger region this place falls within"
+    ] .
+
+
+# -----------------------------------------------------------------------------
+# TimePeriod (CIDOC-CRM E52_Time-Span)
+# A cultural or chronological period — e.g., Late Woodland, Paleo-Indian
+# -----------------------------------------------------------------------------
+va:TimePeriodShape a sh:NodeShape ;
+    sh:targetClass crm:E52_Time-Span ;
+    rdfs:label "Time Period" ;
+    rdfs:comment "A cultural or chronological period" ;
+    sh:order 7 ;
+
+    # Required: period name
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        rdfs:comment "Time period must have exactly one name"
+    ] ;
+
+    # Optional: start date (begin of the begin)
+    sh:property [
+        sh:path crm:P82a_begin_of_the_begin ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        rdfs:comment "Earliest possible start date (e.g., '15000 BP', '900 CE')"
+    ] ;
+
+    # Optional: end date (end of the end)
+    sh:property [
+        sh:path crm:P82b_end_of_the_end ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        rdfs:comment "Latest possible end date"
+    ] ;
+
+    # Optional: descriptive notes
+    sh:property [
+        sh:path crm:P3_has_note ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        rdfs:comment "Description of the time period"
+    ] .
+
+
+# -----------------------------------------------------------------------------
+# Document (CIDOC-CRM E31_Document)
+# A source document — e.g., one of the three PDFs, a referenced report
+# -----------------------------------------------------------------------------
+va:DocumentShape a sh:NodeShape ;
+    sh:targetClass crm:E31_Document ;
+    rdfs:label "Document" ;
+    rdfs:comment "A source document or publication" ;
+    sh:order 8 ;
+
+    # Required: document title
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        rdfs:comment "Document must have exactly one title"
+    ] ;
+
+    # Optional: document type
+    sh:property [
+        sh:path crm:P2_has_type ;
+        sh:datatype xsd:string ;
+        sh:in ( "monograph" "journal article" "report" "thesis" "book chapter" ) ;
+        sh:maxCount 1 ;
+        rdfs:comment "Type of publication"
+    ] ;
+
+    # Optional: author(s)
+    sh:property [
+        sh:path crm:P14_carried_out_by ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E21_Person ;
+        rdfs:comment "Author(s) of the document"
+    ] ;
+
+    # Optional: publication date
+    sh:property [
+        sh:path crm:P4_has_time-span ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E52_Time-Span ;
+        sh:maxCount 1 ;
+        rdfs:comment "Publication date"
+    ] .
+
+
+# -----------------------------------------------------------------------------
+# EncounterEvent (CRMsci S19_Encounter_Event)
+# A discovery event — when an artifact was found at a site
+# Retained from OpenArchaeo as it models archaeological finds
+# -----------------------------------------------------------------------------
+va:EncounterEventShape a sh:NodeShape ;
+    sh:targetClass crmsci:S19_Encounter_Event ;
+    rdfs:label "Discovery Event" ;
+    rdfs:comment "An archaeological discovery or encounter event" ;
+    sh:order 9 ;
+
+    # Optional: event type/method
+    sh:property [
+        sh:path crm:P2_has_type ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        rdfs:comment "Type of discovery (e.g., excavation, survey, surface collection)"
+    ] ;
+
+    # Optional: who made the discovery
+    sh:property [
+        sh:path crm:P14_carried_out_by ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E21_Person ;
+        rdfs:comment "Person who carried out the discovery"
+    ] ;
+
+    # Optional: what was found
+    sh:property [
+        sh:path crmsci:O19_has_found_object ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E22_Man-Made_Object ;
+        rdfs:comment "Artifact(s) discovered in this event"
+    ] ;
+
+    # Optional: where it took place
+    sh:property [
+        sh:path crm:P8_took_place_on_or_within ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E27_Site ;
+        sh:maxCount 1 ;
+        rdfs:comment "Site where the discovery was made"
+    ] ;
+
+    # Optional: when it took place
+    sh:property [
+        sh:path crm:P4_has_time-span ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E52_Time-Span ;
+        sh:maxCount 1 ;
+        rdfs:comment "When the discovery event occurred"
+    ] ;
+
+    # Optional: documented in source material
+    sh:property [
+        sh:path crm:P70i_is_documented_in ;
+        sh:nodeKind sh:IRI ;
+        sh:class crm:E31_Document ;
+        rdfs:comment "Source document(s) that reference this discovery"
+    ] .
