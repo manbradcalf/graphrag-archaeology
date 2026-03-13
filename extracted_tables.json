@@ -1,0 +1,1975 @@
+[
+  {
+    "title": "List of Tables",
+    "headers": ["Table Reference", "Page"],
+    "rows": [
+      [
+        "Table 1.1: Basic characteristics of Virginia's physiographic provinces.",
+        "3"
+      ],
+      [
+        "Table 1.2: Regional watersheds in Virginia and their major river components.",
+        "8"
+      ],
+      [
+        "Table 1.3: Summary of the major river watersheds in the Commonwealth. These are the further described in the following subsection. Source: Virginia Department of Conservation and Recreation",
+        "9"
+      ],
+      ["Table 2.1: Generalized Climate History for the Middle Atlantic", "22"],
+      [
+        "Table 2.2: Working PaleoClimate Division with Applicability to Virginia Prehistoric Research",
+        "23"
+      ],
+      ["Table 5.1: Middle Archaic Projectile Point Types", "61"],
+      [
+        "Table 5.2: Radiocarbon Dates Relevant to the Middle Archaic in Virginia",
+        "62"
+      ],
+      [
+        "Table 5.3: Time Weighted Point Frequency by Sub-Period Ogle Collection",
+        "66"
+      ],
+      ["Table 6.1: Point Types Relevant to the Late Archaic", "78"],
+      ["Table 6.2 Physical Regions of the Commonwealth", "83"],
+      ["Table 6.3 Late Archaic Radiocarbon dates in Virginia", "87"],
+      ["Table 6.4 Virginia Savannah River Radiocarbon Dates by Region", "95"],
+      ["Table 7.1 Early Woodland Point Types", "106"],
+      ["Table 7.2 Principal Early Woodland Ceramic Wares in Virginia", "107"],
+      [
+        "Table 7.3 Radiocarbon Dates Relevant to the Early Woodland in Virginia",
+        "113"
+      ],
+      [
+        "Table 7.4 Relative Frequency of Early Woodland Points on Major Multi-Component Sites in Southern Coastal Plain",
+        "115"
+      ],
+      [
+        "Table 7.5: Time Weighted Projectile Point Counts in Regional Assemblages",
+        "120"
+      ],
+      [
+        "Table 8.1: Middle Woodland Period Names and Temporal Ranges Relevant to Virginia",
+        "125"
+      ],
+      ["Table 8.2: Middle Woodland Diagnostic Artifacts/Coastal Plain", "126"],
+      [
+        "Table 8.3: Middle Woodland Diagnostic Artifacts/Piedmont and Blue Ridge",
+        "129"
+      ],
+      [
+        "Table 8.4: Middle Woodland Diagnostic Artifacts/Northern and Southern Ridge and Valley",
+        "131"
+      ],
+      ["Table 9.1. Calibrated radiocarbon assays from Northern Virginia", "179"]
+    ],
+    "page": 6
+  },
+  {
+    "title": "Basic characteristics of Virginia's physiographic provinces.",
+    "headers": ["Province", "Terrain"],
+    "rows": [
+      [
+        "Coastal Plain",
+        "Mostly flat; increasing minor relief in western areas"
+      ],
+      ["Piedmont", "Rolling hills; steady increase in elevations east to west"],
+      ["Blue Ridge", "High ridgeline, increase in elevation north to south"],
+      [
+        "Ridge and Valley",
+        "Repeating ridges and valleys. Elevations increase east to west"
+      ],
+      ["Appalachian Plateau", "Rugged hills, heavily dissected"]
+    ],
+    "page": 10
+  },
+  {
+    "title": "regional watersheds in Virginia and their major river components.",
+    "headers": ["Regional Watersheds", "Major Component Rivers"],
+    "rows": [
+      ["Chesapeake Bay", "Potomac, Rappahannock, York, James"],
+      ["Carolina Sounds", "Dan, Roanoke, Nottoway, Meherrin, Blackwater"],
+      ["Tennessee Headwlkkaters", "Clinch, Powell, Holston"],
+      ["Upper Ohio", "Big Sandy, New"]
+    ],
+    "page": 15
+  },
+  {
+    "title": "Table 1.3. Summary of the major river watersheds in the Commonwealth. These are the further described in the following subsection. Source: Virginia Department of Conservation and Recreation",
+    "headers": ["River/Watershed", "Area (sq mi)", "Major Tributaries"],
+    "rows": [
+      ["Potomac", "5,702", "North Fork Shenandoah, South Fork Shenandoah"],
+      ["Rappahannock", "2,577", "Rapidan River, Hazel River"],
+      ["York", "2,669", "Mattoponi River, Pamunkey River"],
+      ["James", "10,236", "Jackson River, Rivanna River, Appomattox River"],
+      ["Chesapeake Coastal", "2,577", "Dragon Run/Piankatank River"],
+      ["Atlantic Coastal", "580", "Chincoteague Bay, Hog Island Bay"],
+      ["Albemarle Coastal", "577", "Dismal Swamp, North River, Back Bay"],
+      [
+        "Chowan Basin",
+        "3,675",
+        "Nottoway River, Meherrin River, Blackwater River"
+      ],
+      ["Yadkin", "188", "Ararat headwaters"],
+      ["Roanoke", "6,274", "Dan River, Bannister River"],
+      ["New", "3,068", "Little River, Walker Creek"],
+      ["Holston", "1,322", "North Fork, Middle Fork, South Fork Holston River"],
+      ["Clinch/Powell", "1,811", "Guest River"],
+      ["Big Sandy", "999", "Levisa Fork, Russel Fork, Tug Fork"]
+    ],
+    "page": 16
+  },
+  {
+    "title": "Generalized Climate History for the Middle Atlantic",
+    "headers": ["Period", "Years BP", "Conditions"],
+    "rows": [
+      [
+        "Late Glacial",
+        "15,000-13,000",
+        "Cold and wet. Tundra-like along the ice front to the north. Spruce, fir, and sedges further south"
+      ],
+      [
+        "Pre-Boreal",
+        "13,000-10,700",
+        "Cold and wet. Grasslands and boreal forest. Spruce and cold climate pine dominate."
+      ],
+      [
+        "Boreal",
+        "10,700-9200",
+        "Significant warming. Spruce and fir diminish rapidly and hardwoods expand."
+      ],
+      [
+        "Atlantic",
+        "9200-6600",
+        "Development of modern climate conditions, expanding hardwood forests."
+      ],
+      [
+        "Sub-Boreal",
+        "6,600-2,000",
+        "Warming and drying of climate. Oak-hickory forests dominate. Some expansion of grasslands"
+      ],
+      [
+        "Subatlantic",
+        "2,000-present",
+        "A general and progressive cooling trend. Significant and abrupt shifts in precipitation during mid-period."
+      ]
+    ],
+    "page": 29
+  },
+  {
+    "title": "Working PaleoClimate Division with Applicability to Virginia Prehistoric Research",
+    "headers": ["Cultural Period", "Date BC AD", "Climatic Period/Conditions"],
+    "rows": [
+      [
+        "Paleoindian",
+        "11,500 \u2013 10,900 BC",
+        "Inter-Allerod: Post Glacial: cool but w/ warming trend"
+      ],
+      [
+        "Late Paleo Transition",
+        "10,900 \u2013 8000 BC",
+        "Younger Dryas: sharp reversal in warming; cold, very rapid warming at end Younger Dryas"
+      ],
+      [
+        "Early Archaic",
+        "8000 \u2013 6500 BC",
+        "Boreal: significant warming; dry episodes"
+      ],
+      [
+        "Middle Archaic",
+        "6500 \u2013 2500 BC",
+        "Atlantic: initial cooling with 8.2k Event, then Hypsithermal peak in warm/dry conditions"
+      ],
+      [
+        "Late Archaic",
+        "2500 \u2013 1100 BC",
+        "Sub-boreal; some amelioration with periodic instability; strong warming at end of period"
+      ],
+      [
+        "Early Woodland",
+        "1100 BC \u2013 AD 250",
+        "Sub-boreal to Subatlantic: initial warm, then sharp cooling with shifts in precipitation later in period."
+      ],
+      [
+        "Middle Woodland",
+        "AD 250 \u2013 900",
+        "Subatlantic: continued moderately cool and moist, variable precipitation at times, cold episodes late"
+      ],
+      [
+        "Late Woodland",
+        "AD 900 \u2013 1650",
+        "Medieval Warm Period: slight warming with generally more stable conditions, Little Ice Age"
+      ],
+      [
+        "Proto/Early Historic",
+        "_ _ _ _ _ _ _ _ _",
+        "Little Ice Age: cool with severe droughts and variable precipitation"
+      ]
+    ],
+    "page": 30
+  },
+  {
+    "title": "Chronology for projectile points as constructed by McAvoy on the Coastal Plain",
+    "headers": ["Point Type", "Date (BC)", "Date (BP)"],
+    "rows": [
+      [
+        "Hardaway Side-Notched",
+        "8450 \u2013 7550 BC",
+        "(10,400 \u2013 9500 BP)"
+      ],
+      [
+        "Charleston Corner-Notched",
+        "7950 \u2013 7450 BC",
+        "(9900 \u2013 9400 BP)"
+      ],
+      ["Palmer/Kirk", "7450 \u2013 7050 BC", "(9400 \u2013 9000 BP)"],
+      ["Decatur", "7300 \u2013 7000 BC", "(9250 \u2013 8950 BP)"],
+      [
+        "Fort Nottaway Side-Notched",
+        "7000 \u2013 6800 BC",
+        "(8950\u20138750 BP)"
+      ]
+    ],
+    "page": 51
+  },
+  {
+    "title": "Early Archaic Period Chronology (MacCorkle Forms)",
+    "headers": ["Period", "Date BC", "Date BP"],
+    "rows": [
+      [
+        "Early Archaic I (Palmer, Kirk, Amos)",
+        "8000 \u2013 7500 BC",
+        "9900 \u2013 9450 BP"
+      ],
+      [
+        "Early Archaic II (Warren, Big Sandy, Kessell)",
+        "7500 \u2013 7200 BC",
+        "9450 \u2013 9150 BP"
+      ],
+      [
+        "Early Archaic III (Kirk Stemmed, etc.)",
+        "7200 \u2013 6800 BC",
+        "9150 \u2013 8750 BP"
+      ]
+    ],
+    "page": 52
+  },
+  {
+    "title": "Projectile Point Chronology (Egloff)",
+    "headers": ["Point Type", "Date BC", "Date BP"],
+    "rows": [
+      ["Big Sandy", "9000 \u2013 7500 BC", "7050 \u2013 5550 BP"],
+      ["Charlestown", "8000 \u2013 7500 BC", "6050 \u2013 5550 BP"],
+      ["Palmer", "8000 \u2013 7200 BC", "6050 \u2013 5250 BP"],
+      ["Kirk Corner-notched", "7400 \u2013 6500 BC", "5450 \u2013 4550 BP"],
+      ["Decatur", "7200 \u2013 7000 BC", "5250 \u2013 5050 BP"],
+      ["Fort Nottoway", "7000 \u2013 6700 BC", "5050 \u2013 4750 BP"]
+    ],
+    "page": 52
+  },
+  {
+    "title": "Table 5.1. lists the major Middle Archaic point types relevant to the Middle Archaic in Virginia.",
+    "headers": ["Type", "Distribution", "Notes"],
+    "rows": [
+      [
+        "Brewerton Cluster",
+        "Mostly North?",
+        "late Middle Archaic to Late Archaic"
+      ],
+      ["Vernon", "North and East?", "late Middle Archaic? Early Woodland?"],
+      ["Clagett", "North and East?", "late Middle Archaic?"],
+      ["Rowan", "South and Southeast?", "late Middle Archaic"],
+      ["Halifax", "Mostly East of Blue Ridge", "late Middle Archaic"],
+      ["Guilford", "Statewide", "Middle Archaic"],
+      ["Morrow Mountain II", "Statewide", "Middle Archaic"],
+      ["Morrow Mountain I", "Statewide", "Middle Archaic"],
+      ["Cedar Creek", "Mostly West and Central?", "Middle Archaic"],
+      ["Stanly", "Statewide", "Middle Archaic"],
+      ["Kanawha", "Statewide but mostly West", "early Middle Archaic"],
+      ["Kirk Serrated", "Statewide", "early Middle Archaic"],
+      ["LeCroy", "Statewide", "early Middle Archaic"],
+      ["St Albans", "Statewide", "late Early Archaic"],
+      ["McCorkle", "Mostly West?", "late Early Archaic"]
+    ],
+    "page": 68
+  },
+  {
+    "title": "Radiocarbon Dates Relevant to the Middle Archaic in Virginia",
+    "headers": ["Assoc. Points", "Date", "Site", "Reference"],
+    "rows": [
+      [
+        "Halifax",
+        "4850 \u00b1 80 BP (cal 2 sigma BC 3510 to 3770)",
+        "Cactus Hill (44SX202)",
+        "McAvoy and McAvoy 2015 (Beta-80184)"
+      ],
+      [
+        "Halifax",
+        "5180 \u00b160 BP (cal 2 sigma BC 3810 to 4220)",
+        "Cactus Hill (44SX202)",
+        "McAvoy and McAvoy 2015 (Beta-83012)"
+      ],
+      [
+        "Guilford",
+        "4980 \u00b1 170 BP (cal 2 sigma BC 3370 to 4230)",
+        "Cactus Hill (44SX202)",
+        "McAvoy and McAvoy 2015 (Beta-80183)"
+      ],
+      [
+        "Cedar Creek-like",
+        "5120 \u00b1 160 BP (cal 2 sigma BC 4324 to 3638)",
+        "Jeffrey Harris (44LD17)",
+        "Johnson 1968 (SI-363)"
+      ],
+      [
+        "Cedar Creek",
+        "5690 \u00b1 260 BP (cal 2 sigma BC 5208 to 3993)",
+        "Daugherty's Cave (44RU14)",
+        "Benthall 1990 (FSU-329)"
+      ],
+      [
+        "Morrow Mountain II",
+        "4980 \u00b1 50 BP (cal 2 sigma BC 3941 to 3652)",
+        "(44IW148)",
+        "Traver 1995 (Beta-82468)"
+      ],
+      [
+        "Morrow Mountain II",
+        "5380 \u00b1 140 BP (cal 2 sigma BC 4519 to 3824)",
+        "Peaks of Otter (44BE1)",
+        "Griffin & Reeves 1968 (I-1680)"
+      ],
+      [
+        "Morrow Mountain II",
+        "6470 \u00b1 90 BP",
+        "Slade Complex (multiple)",
+        "McAvoy and McAvoy 2015 (Beta-22838)"
+      ],
+      [
+        "Morrow Mountain I",
+        "6700 \u00b1 130 BP (cal 2 sigma BC 5880 to 5379)",
+        "Cactus Hill (44SX202)",
+        "McAvoy and McAvoy 1997 (Beta-98363)"
+      ],
+      [
+        "Stanly",
+        "7420 \u00b1 160 BP (cal 2 sigma BC 6590 to 6003)",
+        "Slade Complex (multiple)",
+        "McAvoy and McAvoy 1997 (Beta-24427)"
+      ],
+      [
+        "Kirk Serrated",
+        "7730 \u00b1 50 BP (cal 2 sigma BC 6643 to 6468)",
+        "Echols Farm (44RB462)",
+        "Fiedel et al. 2008 (Beta-231438)"
+      ],
+      [
+        "LeCroy",
+        "8300 \u00b1 110 BP (cal 2 sigma BC 7543 to 7073)",
+        "Slade Complex (multiple)",
+        "McAvoy and McAvoy 1997 (Beta-16255)"
+      ]
+    ],
+    "page": 69
+  },
+  {
+    "title": "Table 5.3. Time Weighted Point Frequency by Sub-Period Ogle Collection",
+    "headers": [
+      "Period",
+      "Point Types",
+      "Years",
+      "Points",
+      "Points/100 Yrs",
+      "Percent Change"
+    ],
+    "rows": [
+      [
+        "Paleoindian 9200 BC \u2013 8000 BC",
+        "Paleo Fluted, Hardaway Dalton, Hardaway Side Notched",
+        "1,200",
+        "6  6",
+        "0.5",
+        "0.n5/a"
+      ],
+      [
+        "Early Archaic 8000 BC \u2013 6500 BC",
+        "Palmer, Kirk Corner, Kirk Stemmed, Fort Nottoway, Decatur, MacCorkle, St. Albans",
+        "1,500",
+        "260",
+        "17.3",
+        "* Plus 3360 %"
+      ],
+      [
+        "Middle Archaic-1 6500 BC \u2013 4500 BC",
+        "LeCroy, Kirk Serrated, Kanawha, Stanly",
+        "2,000",
+        "214",
+        "10.7",
+        "Minus 38 %"
+      ],
+      [
+        "Middle Archaic-2 4500 BC \u2013 2500 BC",
+        "Morrow Mountain I and II, Guilford, Cedar Creek, Halifax/MA SN",
+        "2,000",
+        "1,125",
+        "56.3",
+        "Plus 426 %"
+      ],
+      [
+        "Late Archaic 2500 BC \u2013 1100 BC",
+        "Late Archaic Stemmed, All Broadspears",
+        "1,400",
+        "1,317",
+        "94.1",
+        "Plus 67%"
+      ],
+      [
+        "Early Woodland 1100 BC \u2013 400 BC",
+        "Early Woodland Group",
+        "600",
+        "216",
+        "36.0",
+        "Minus 62 %"
+      ]
+    ],
+    "page": 73
+  },
+  {
+    "title": "Point Types Relevant to the Late Archaic",
+    "headers": ["Type", "Distribution", "Notes"],
+    "rows": [
+      ["Calvert", "Common only in Potomac drainage", "Early Woodland"],
+      ["Fishtail", "Statewide", "Early Woodland Transition"],
+      ["Piscataway", "Primarily N and E", "Late Archaic?/Early Woodland"],
+      [
+        "Perkiomen",
+        "Statewide; rare; cluster in SE, NE",
+        "Isolated occurrence elsewhere"
+      ],
+      [
+        "Susquehanna",
+        "Common only in Potomac drainage",
+        "Isolated occurrence elsewhere"
+      ],
+      ["Small Savannah River", "Statewide", "Archaic to Woodland transition"],
+      ["Cattle Run", "Mostly South", "Later variant?"],
+      ["Savannah River", "Statewide", "Dominant in all areas but SW"],
+      [
+        "Savannah River Narrow",
+        "East of Blue Ridge, most common N.",
+        "Temporal range unclear"
+      ],
+      [
+        "Poplar Island",
+        "SE; Intermittent north of James",
+        "Temporal/geo. range unclear"
+      ],
+      [
+        "Bare Island",
+        "SE; Intermittent north of James",
+        "Temporal/geo. range unclear"
+      ],
+      ["Iddins-like", "SW, Great Valley?", "Temporal/geo. range unclear"],
+      ["Lamoka", "Statewide", "\"Lamoka-like\" often applied"],
+      [
+        "Slade/Lobate",
+        "Cluster in SE and N Piedmont",
+        "Middle Archaic Transition?"
+      ],
+      ["Halifax", "Statewide", "late Middle Archaic"],
+      [
+        "Brewerton Cluster",
+        "Statewide?; rare outside N VA",
+        "late Middle Archaic"
+      ]
+    ],
+    "page": 85
+  },
+  {
+    "title": "Physical Regions of the Commonwealth Coastal Plain",
+    "headers": ["Region", "Sub-region"],
+    "rows": [
+      [
+        "Potomac River Drainage",
+        "Middle Peninsula\u2014Rappahannock/York Drainage"
+      ],
+      ["Potomac River Drainage", "James River Drainage"],
+      [
+        "Potomac River Drainage",
+        "Carolina Sounds/Dismal Swamp/Atlantic Drainages"
+      ],
+      ["Potomac River Drainage", "Eastern Shore"],
+      ["Piedmont", "Northern Piedmont"],
+      ["Piedmont", "James River"],
+      ["Piedmont", "Southern Piedmont"],
+      ["Blue Ridge", "Northern Blue Ridge"],
+      ["Blue Ridge", "Southern Blue Ridge"],
+      [
+        "Ridge and Valley",
+        "Northern Ridge and Valley\u2014Potomac/Shenandoah Drainage"
+      ],
+      ["Ridge and Valley", "Central Ridge and Valley\u2014James Drainage"],
+      [
+        "Ridge and Valley",
+        "Southwest Virginia\u2014New River and Tennessee River Headwaters"
+      ],
+      ["Appalachian Plateau", "Undifferentiated"]
+    ],
+    "page": 90
+  },
+  {
+    "title": "Late Archaic Radiocarbon dates in Virginia",
+    "headers": ["Assoc. Material", "Date", "Site", "Reference"],
+    "rows": [
+      ["**Coastal Plain**", "", "", ""],
+      [
+        "Savannah River*",
+        "3260 \u00b1 90 BP (cal 2 sigma BC 1754 to 1317)",
+        "Pony Pasture (44HE313)",
+        "McLearen 1987 (Beta-12458)"
+      ],
+      [
+        "Savannah River",
+        "3905 \u00b1 95 BP (cal 2 sigma BC 2832 to 2048)",
+        "Plum Nelly (44NB128)",
+        "Potter 1982 (SI-4229)"
+      ],
+      [
+        "Savannah River",
+        "4105 \u00b1 -85 BP (cal 2 sigma BC 2881 to 2478)",
+        "Plum Nelly (44NB128)",
+        "Potter 1982 (SI-4228)"
+      ],
+      [
+        "Savannah River",
+        "4070 \u00b1 80 BP (cal 2 sigma BC 2882 to 2461)",
+        "Slade (44SX6)",
+        "McAvoy 1997 (Beta-22156)"
+      ],
+      [
+        "Steatite",
+        "3500 \u00b1 75 BP (cal 2 sigma BC 2024 to 1634)",
+        "White Oak Point (44WM0119)",
+        "Wasselkov 1982 (DIC-1771)"
+      ],
+      [
+        "Steatite",
+        "3380 \u00b1 50 BP (cal 2 sigma BC 1870 to 1525)",
+        "David (44FX2634)",
+        "Inashima 2006 (Beta-177178)"
+      ],
+      [
+        "Steatite",
+        "3550 \u00b1 90 BP (cal 2 sigma BC 2139 to 1664)",
+        "David (44FX2634)",
+        "Inashima 2006 (Beta-190741)"
+      ],
+      [
+        "Chesapeake Diamond",
+        "4150 \u00b1 50 BP (cal 2 sigma BC 2910 to 2470)",
+        "Magnolia (44SK155)",
+        "Blanton 2002 (Beta-153847)"
+      ],
+      ["**Piedmont/Fall Line**", "", "", ""],
+      [
+        "Savannah River",
+        "4280 \u00b1 60 BP (cal 2 sigma BC 3088 to 2674)",
+        "Tuckahoe (44HE713/714)",
+        "Fiedel & Belicki 1997 (Beta-97722)"
+      ],
+      [
+        "Savannah River",
+        "4380 \u00b1 60 BP (cal 2 sigma BC 3327 to 2891)",
+        "44PO81",
+        "Pullins & Monroe 2004 (Beta-160614)"
+      ],
+      ["**Ridge and Valley (including SW VA)**", "", "", ""],
+      [
+        "Savannah River",
+        "3600 \u00b1 70 BP (cal 2 sigma BC 2140 to 1752)",
+        "Daugherty Cave (44RU14)",
+        "Benthall 1990 (Beta-19278)"
+      ],
+      [
+        "Savannah River",
+        "3800 \u00b1 70 BP (cal 2 sigma BC 2463 to 2035)",
+        "Daugherty Cave (44RU14)",
+        "Benthall 1990 (Beta-19279)"
+      ],
+      [
+        "Savannah River",
+        "4300 \u00b1 80 BP (cal 2 sigma BC 3321 to 2633)",
+        "Daugherty Cave (44RU14)",
+        "Benthall 1990 (Beta-19280)"
+      ],
+      [
+        "Savannah River",
+        "4690 \u00b1 70 BP (cal 2 sigma BC 3636 to 3355)",
+        "Daugherty Cave (44RU14)",
+        "Benthall 1990 (Beta-19281)"
+      ],
+      [
+        "Steatite/Post",
+        "3570 \u00b1 70 BP (cal 2 sigma BC 2133 to 1739)",
+        "Edd's Mill (44LE99)",
+        "Egghart 1991 (Beta-42691)"
+      ],
+      [
+        "Human Burial",
+        "4860+/-40 BP",
+        "Chadwell (44LE124)",
+        "Voigt et al. 2000"
+      ],
+      [
+        "Post Feature",
+        "4390 \u00b1 40 BP",
+        "44LE165",
+        "Pullins 1999 (Beta-12455)"
+      ],
+      [
+        "Shallow pit",
+        "3580 \u00b1 110 BP (cal 2 sigma BC 2276 to 1635)",
+        "656 Elk Garden (44RU61)",
+        "McLearen 1990 (Beta-29911)"
+      ],
+      [
+        "Shallow pit",
+        "3990 \u00b1 70 BP (cal 2 sigma BC 2854 to 2290)",
+        "656 Elk Garden (44RU61)",
+        "McLearen 1990 (Beta-29910)"
+      ],
+      [
+        "Shallow pit",
+        "4090 \u00b1 120 BP (cal 2 sigma BC 2913 to 2297)",
+        "656 Elk Garden (44RU61)",
+        "McLearen 1990 (Beta-29912)"
+      ]
+    ],
+    "page": 94
+  },
+  {
+    "title": "Virginia Savannah River Radiocarbon Dates by Region",
+    "headers": ["Region", "Mean", "Median", "Range"],
+    "rows": [
+      [
+        "Coastal Plain/Fall Line/Outer Piedmont N=5",
+        "Mean 4150 RCYBP",
+        "Median 4200 RCYBP",
+        "Range 475 RCYBP"
+      ],
+      [
+        "West of Blue Ridge N=7",
+        "Mean 3920 RCYBP",
+        "Median 3700 RCYBP",
+        "Range 1120 RCYBP"
+      ]
+    ],
+    "page": 102
+  },
+  {
+    "title": "Early Woodland Point Types",
+    "headers": ["Type", "Distribution", "Notes"],
+    "rows": [
+      ["Teardrop", "East of Blue Ridge", "Early to Middle Woodland"],
+      ["Small Stemmed", "Statewide?", "Early Woodland"],
+      ["Gypsy Stemmed", "Far South, SW", "Early Woodland"],
+      ["Badin", "South and East?", "Early Woodland Triangle?"],
+      ["Will's Cove", "Coastal Plain", "Early Woodland"],
+      ["Calvert", "North and East", "Early Woodland"],
+      ["Small Savannah River", "Statewide", "Late Archaic into Early Woodland"],
+      ["Piscataway", "Statewide except SW", "Late Archaic and Early Woodland"],
+      [
+        "Fishtail",
+        "Intermittent Statewide",
+        "Late Archaic into Early Woodland"
+      ],
+      [
+        "Susquehanna",
+        "Intermittent Statewide",
+        "Late Archaic into Early Woodland"
+      ],
+      ["Vernon", "North and East", "Middle Archaic? Early Woodland?"]
+    ],
+    "page": 113
+  },
+  {
+    "title": "Principal Early Woodland Ceramic Wares in Virginia",
+    "headers": ["Type", "Distribution", "Notes"],
+    "rows": [
+      ["Elk Island", "Coastal Plain and Southern Piedmont", "Accokeek Variant"],
+      ["Hyco", "Southern Piedmont; Roanoke Drainage", "Accokeek Variant?"],
+      ["Accokeek", "Coastal Plain, Piedmont, Potomac drainage", ""],
+      ["Currituck", "Far Southeast", "Flat Bottom Beaker"],
+      ["Croaker Landing", "Southeast only", ""],
+      ["Swannanoa", "Far Southwest", "Oldest ware in SW"],
+      ["Dames Quarter", "Eastern Shore?", ""],
+      ["Ware Plain", "Coastal Plain, Potomac drainage", ""],
+      ["Selden Island", "Coastal Plain, Potomac drainage", ""],
+      ["Marcey Creek", "Coastal Plain, Piedmont, Potomac drainage", ""],
+      ["Bushnell Plain", "Coastal Plain and Outer Piedmont", ""]
+    ],
+    "page": 114
+  },
+  {
+    "title": "Radiocarbon Dates Relevant to the Early Woodland in Virginia",
+    "headers": ["Assoc. Material", "Date", "Site", "Reference"],
+    "rows": [
+      ["Coastal Plain", "", "", ""],
+      [
+        "Small Savannah River",
+        "3260 \u00b1 90 BP (cal 2 sigma BC 1754 to 1317)",
+        "Pony Pasture (HE0313)",
+        "McLearen 1987 (Beta-12458)"
+      ],
+      [
+        "Calvert, Bushnell Plain",
+        "3020 \u00b1 70 BP (cal 2 sigma BC 1424 to 1053)",
+        "White Oak Point (WM0119)",
+        "Waselkov 1982 (SI-4376)"
+      ],
+      [
+        "Calvert, Bushnell Plain",
+        "3060 \u00b1 75 BP (cal 2 sigma BC 1495 to 1090)",
+        "White Oak Point (44WM0119)",
+        "Waselkov 1982 (SI-4375)"
+      ],
+      [
+        "Calvert, Bushnell Plain",
+        "3110 \u00b1 70 BP (cal 2 sigma BC 1523 to 1131)",
+        "White Oak Point (44WM0119)",
+        "Waselkov 1982 (SI-4377)"
+      ],
+      [
+        "Croaker Landing",
+        "3080 \u00b1 70 BP (cal 2 sigma BC 1495 to 1128)",
+        "Enfield Plantation (44KW0081)",
+        "Pullins et al. 1996 (Beta-80925)"
+      ],
+      ["Piedmont", "", "", ""],
+      [
+        "Elk Island, Small Savannah River",
+        "2840 \u00b1 155 BP (cal 2 sigma BC 1448 to 668)",
+        "Stoneman West (44GO0040)",
+        "Mouer et al. 1981 (UGa-3347)"
+      ],
+      [
+        "Selden Island Small Sav. River",
+        "3150 \u00b1 40 BP",
+        "Clark's Branch (44FX3226)",
+        "Inashima 2011 (Beta-272400)"
+      ],
+      [
+        "Selden Island",
+        "2800 \u00b1 40 BP (cal 2 sigma BC 1050 to 837)",
+        "Clark's Branch (44FX3226)",
+        "Inashima 2011 (Beta-244349)"
+      ],
+      [
+        "Marcey Creek",
+        "3070 \u00b1 40 BP (cal 2 sigma BC1429 to 1215)",
+        "(44P00081)",
+        "Pullins and Monroe 2004 (Beta-160613)"
+      ],
+      ["Ridge and Valley (Northern Shenandoah Valley)", "", "", ""],
+      [
+        "Accokeek, Marcey Creek",
+        "2800 \u00b1 90 BP (cal 2 sigma BC 1249 to 801)",
+        "522 Bridge (44WR0329)",
+        "McLearen 1991 (Beta-34386)"
+      ],
+      [
+        "Accokeek, Marcey Creek, Fishtail",
+        "2930 \u00b1 100 BP (cal 2 sigma BC 1405 to 903)",
+        "522 Bridge (44WR0329)",
+        "McLearen 1991 (Beta-34388)"
+      ],
+      [
+        "Accokeek",
+        "2960 \u00b1 120 BP (cal 2 sigma BC 1450 to 855)",
+        "522 Bridge (44WR0329)",
+        "McLearen 1991 (Beta-34389)"
+      ],
+      [
+        "Susquehanna, Accokeek",
+        "2740 \u00b1 150 BP (cal 2 sigma BC 1370 to 515)",
+        "522 Bridge (44WR0329)",
+        "McLearen 1991 (Beta-34390)"
+      ],
+      [
+        "Selden Island",
+        "2930\u00b1 30 BP (cal 2 sigma BC1220 to 1020)",
+        "44WR0323",
+        "Fiedel 2013 (Beta-31542)"
+      ],
+      [
+        "Selden Island",
+        "2750 \u00b1 30 BP (cal 2 sigma BC 980 to 820)",
+        "44WR0323",
+        "Fiedel 2013 (Beta-309906)"
+      ],
+      [
+        "Selden Island Accokeek, celt",
+        "2663 \u00b1 26 BP (cal 2 sigma BC 900 to 790)",
+        "44WR0323",
+        "Fiedel 2013 (D-AMS 1217-338)"
+      ],
+      [
+        "Accokeek",
+        "2790 \u00b1 40 BP (cal 2 sigma BC 1030 to 840)",
+        "44WR0446",
+        "Fiedel 2013 (Beta-259383)"
+      ],
+      ["Ridge and Valley (Southwest VA)", "", "", ""],
+      [
+        "Gyspy Stemmed, Swannanoa",
+        "2950 \u00b1 90 BP (cal 2 sigma BC 1401 to 929)",
+        "Wheeler (44LE0133)",
+        "McLearen 1994 b(Beta-66994)"
+      ],
+      [
+        "Swannanoa",
+        "2740 \u00b170 BP (cal 2 sigma BC 1106 to 791)",
+        "Wheeler (44LE0133)",
+        "McLearen 1994b (Beta-66991)"
+      ],
+      [
+        "Swannanoa",
+        "2640 \u00b1 90 BP (cal 2 sigma BC 1011 to 426)",
+        "Wheeler (44LE0133)",
+        "McLearen 1994 b(Beta-66992)"
+      ]
+    ],
+    "page": 120
+  },
+  {
+    "title": "Table 7.4: Relative Frequency of Early Woodland Points on Major Multi-Component Sites in Southern Coastal Plain",
+    "headers": [
+      "Site",
+      "Setting",
+      "Total Points",
+      "EW Points",
+      "Percent of Total"
+    ],
+    "rows": [
+      [
+        "Stony Creek 3 (44SX0405)",
+        "Floodplains at Nottoway confluence",
+        "956",
+        "49",
+        "5.1%"
+      ],
+      ["Carter 2 (44SX0411)", "Galley/Rowanty Swamps", "699", "64", "9.2%"],
+      [
+        "Disputanta (44SX0553)",
+        "Mid-reach Blackwater Swamp",
+        "141",
+        "27",
+        "19.3%"
+      ],
+      ["Nase (44HE0001)", "Mid-reach Chickahominy Swamp", "82", "11", "13.3%"],
+      [
+        "Deep Bottom (44HE007/0038)",
+        "Tidal James River\u2014Four Mile Creek",
+        "240",
+        "0",
+        "0.0%"
+      ]
+    ],
+    "page": 122
+  },
+  {
+    "title": "Time Weighted Projectile Point Counts in Regional Assemblages",
+    "headers": [
+      "Assemblage",
+      "Late Archaic Points/100 yrs",
+      "Early Woodland Points/100 yrs",
+      "Change in EW Points/100 yrs"
+    ],
+    "rows": [
+      ["Ogle Collection Nottoway", "94.1", "36.0", "Minus 62%"],
+      ["Nottoway River Survey", "52.3", "18.0", "Minus 66%"],
+      ["North Carolina", "231.9", "168.3", "Minus 27%"],
+      ["Eastern Henrico County", "7.6", "8.5", "Plus 12%"]
+    ],
+    "page": 127
+  },
+  {
+    "title": "Middle Woodland Period Names and Temporal Ranges Relevant to Virginia",
+    "headers": ["Region", "Period Name", "Temporal Range", "Reference"],
+    "rows": [
+      [
+        "Middle Atlantic",
+        "Middle Woodland I",
+        "2500 - 1800 BP",
+        "Gardner 1982"
+      ],
+      [
+        "Middle Atlantic",
+        "Middle Woodland I",
+        "1800 - 1100 BP",
+        "Gardner 1982"
+      ],
+      [
+        "Southwest Virginia",
+        "Middle/Late Woodland",
+        "1700 - 1000 BP",
+        "Reid 1997"
+      ],
+      [
+        "Southside Virginia",
+        "Early/Middle Woodland",
+        "2200 - 1100 BP",
+        "McLearen 1992; Hodges 1998"
+      ],
+      ["Delmarva", "Woodland I", "5000 - 1000 BP", "Custer 1989"]
+    ],
+    "page": 132
+  },
+  {
+    "title": "Table 8.2. Middle Woodland Diagnostic Artifacts/Coastal Plain",
+    "headers": ["", "Ceramics", "Projectile Points"],
+    "rows": [
+      [
+        "Middle Woodland II",
+        "Abbott Zoned-Incised Mockley Hercules Mount Pleasant Nomini Varina Chesterfield",
+        "Yadkin Levanna Jacks Reef Corner-Notched Jacks Reed Pentagonal Nomini Fox Creek/Selby Bay"
+      ],
+      [
+        "Middle Woodland I",
+        "Prince George Stony Creek Pope's Creek Accokeek",
+        "Potts Rossville/Piscataway Vernon Calvert"
+      ]
+    ],
+    "page": 133
+  },
+  {
+    "title": "Table 8.3. Middle Woodland Diagnostic Artifacts/Piedmont and Blue Ridge",
+    "headers": ["", "Ceramics", "Projectile Points"],
+    "rows": [
+      [
+        "Middle Woodland II",
+        "Albemarle\nHell Island/\nShockoe Fabric\nImpressed Grayson\nYadkin Uhwarrie",
+        "Yadkin\nMadison\nLevanna\nJacks Reef Corner-Notched Jacks\nReef Pentagonal\nFox Creek/Selby Bay"
+      ],
+      [
+        "Middle Woodland I",
+        "Albemarle\nVincent Clements\nPope's Creek",
+        "Potts\nRossville/Piscataway\nTeardrop\nVernon"
+      ]
+    ],
+    "page": 136
+  },
+  {
+    "title": "Table 8.4. Middle Woodland Diagnostic Artifacts/ Northern and Southern Ridge and Valley",
+    "headers": ["Period", "Ceramics", "Projectile Points"],
+    "rows": [
+      [
+        "Middle Woodland II",
+        "Albemarle\nCandy Creek\nConnestee\nWright Check\nStamped Mulberry\nCreek Plain Bluff\nCreek Simple Stamped",
+        "Yadkin\nLevanna\nJacks Reef\nCorner-Notched\nJacks Reef\nPentagonal"
+      ],
+      [
+        "Middle Woodland I",
+        "Albemarle\nLong Branch Fabric Impressed\nPopes Creek",
+        "Potts\nRossville/Piscataway\nVernon"
+      ]
+    ],
+    "page": 138
+  },
+  {
+    "title": "Table 9.1. Calibrated radiocarbon assays from Northern Virginia. Note: some of the sites may be outside of the area defined here as Northern Virginia, but are in counties that overlap this area.",
+    "headers": [
+      "Laboratory#",
+      "County/city name",
+      "Site#",
+      "Site name",
+      "Calibrated Radiocarbon Age",
+      "Reference"
+    ],
+    "rows": [
+      [
+        "SI-219",
+        "Augusta",
+        "20",
+        "Lewis Creek Mound",
+        "580 \u00b1 200 BP (cal 2 \u03c3 AD 1017 to 1953)",
+        "MacCord and Valliere 1965"
+      ],
+      [
+        "SI-218",
+        "Augusta",
+        "20",
+        "Lewis Creek Mound",
+        "860 \u00b1 240 BP (cal 2 \u03c3 AD 653 to 1485)",
+        "MarCord and Valliere 1965"
+      ],
+      [
+        "Beta-108336",
+        "Augusta",
+        "20",
+        "Lewis Creek Mound",
+        "980 \u00b1 50 BP (cal 2 \u03c3 AD 973 to 1180)",
+        "Trimble 1996"
+      ],
+      [
+        "Beta-108337",
+        "Augusta",
+        "35",
+        "John East Mound",
+        "970 \u00b1 50 BP (cal 2 \u03c3 AD 983 to 1186)",
+        "Trimble 1996"
+      ],
+      [
+        "SI-367",
+        "Augusta",
+        "35",
+        "John East Mound",
+        "730 \u00b1 90 BP (cal 2 \u03c3 AD 1050 to 1413)",
+        "Valliere and MacCord 1985"
+      ],
+      [
+        "SI-366",
+        "Augusta",
+        "35",
+        "John East Mound",
+        "640 \u00b1 150 BP (cal 2 \u03c3 AD 1035 to 1626)",
+        "Valliere and MacCord 1985"
+      ],
+      [
+        "SI-365",
+        "Augusta",
+        "35",
+        "John East Mound",
+        "1050 \u00b1 290 BP (cal 2 \u03c3 AD 396 to 1436)",
+        "Valliere and MacCord 1985"
+      ],
+      [
+        "SI-480",
+        "Augusta",
+        "51",
+        "Lewis Creek Cement Plant",
+        "1100 \u00b1 60 BP (cal 2 \u03c3 AD 779 to 1026)",
+        "Valliere and Harter 1986"
+      ],
+      [
+        "SI-5891",
+        "Bath",
+        "0",
+        "Williams Cave",
+        "920 \u00b1 65 BP (cal 2 \u03c3 AD 1000 to 1253)",
+        "Faulkner 1988"
+      ]
+    ],
+    "page": 186
+  },
+  {
+    "title": "Table 9.1. continued",
+    "headers": [
+      "Laboratory#",
+      "County/city name",
+      "Site#",
+      "Site name",
+      "Calibrated Radiocarbon Age",
+      "Reference"
+    ],
+    "rows": [
+      [
+        "SI-5791",
+        "Bath",
+        "0",
+        "Williams Cave",
+        "890 \u00b1 70 BP (cal 2 \u03c3 AD 1023 to 1261)",
+        "Faulkner 1988"
+      ],
+      [
+        "SI-5792",
+        "Bath",
+        "0",
+        "Williams Cave",
+        "955 \u00b1 75 BP (cal 2 \u03c3 AD 900 to 1252)",
+        "Faulkner 1988"
+      ],
+      [
+        "UGa-873",
+        "Bath",
+        "3",
+        "Perkins Point",
+        "550 \u00b1 60 BP (cal 2 \u03c3 AD 1296 to 1445)",
+        "MacCord 1985"
+      ],
+      [
+        "Beta-261039",
+        "Bath",
+        "3",
+        "Perkins Point",
+        "40 \u00b1 40 BP (cal 2 \u03c3 AD 1691 to 1926)",
+        "Means and McKnight 2010"
+      ],
+      [
+        "Beta-261038",
+        "Bath",
+        "3",
+        "Perkins Point",
+        "340 \u00b1 40 BP (cal 2 \u03c3 AD 1462 to 1643)",
+        "Means and McKnight 2010"
+      ],
+      [
+        "UGa-3083",
+        "Bath",
+        "3",
+        "Perkins Point",
+        "435 \u00b1 50 BP (cal 2 \u03c3 AD 1408 to 1632)",
+        "Whyte and Geier 1982, Geier and Boyer 1982"
+      ],
+      [
+        "UGa-3080",
+        "Bath",
+        "3",
+        "Perkins Point",
+        "315 \u00b1 60 BP (cal 2 \u03c3 AD 1450 to 1795)",
+        "Whyte and Geier 1982, Geier and Boyer 1982"
+      ],
+      [
+        "UGa-3082",
+        "Bath",
+        "3",
+        "Perkins Point",
+        "440 \u00b1 130 BP (cal 2 \u03c3 AD 1278 to 1953)",
+        "Whyte and Geier 1982, Geier and Boyer 1982"
+      ],
+      [
+        "UGa-4057",
+        "Bath",
+        "5",
+        "Huffman",
+        "1625 \u00b1 400 BP (cal 2 \u03c3 730 B.C. to AD 1186)",
+        "Geier and Warren 1982"
+      ],
+      [
+        "UGa-4048",
+        "Bath",
+        "5",
+        "Huffman",
+        "730 \u00b1 65 BP (cal 2 \u03c3 AD 1165 to 1396)",
+        "Geier and Warren 1982a, Geier and Boyer 1982"
+      ],
+      [
+        "UGa-4055",
+        "Bath",
+        "5",
+        "Huffman",
+        "765 \u00b1 65 BP (cal 2 \u03c3 AD 1052 to 1390)",
+        "Geier and Warren 1982a, Geier and Boyer 1982"
+      ],
+      [
+        "UGa-4056",
+        "Bath",
+        "5",
+        "Huffman",
+        "1065 \u00b1 70 BP (cal 2 \u03c3 AD 779 to 1154)",
+        "Geier and Warren 1982a, Geier and Boyer 1982"
+      ],
+      [
+        "UGa-4054",
+        "Bath",
+        "5",
+        "Huffman",
+        "935 \u00b1 75 BP (cal 2 \u03c3 AD 985 to 1256)",
+        "Geier and Warren 1982a, Geier and Boyer 1982"
+      ],
+      [
+        "Beta-261037",
+        "Bath",
+        "5",
+        "Huffman",
+        "440 \u00b1 40 BP (cal 2 \u03c3 AD 1410 to 1620)",
+        "Means and McKnight 2010"
+      ],
+      [
+        "UGa-4053",
+        "Bath",
+        "15",
+        "Noah's Ark",
+        "675 \u00b1 65 BP (cal 2 \u03c3 AD 1226 to 1409)",
+        "Geier and Warren 1982b, Geier and Boyer 1982"
+      ],
+      [
+        "UGa-4051",
+        "Bath",
+        "15",
+        "Noah's Ark",
+        "695 \u00b1 70 BP (cal 2 \u03c3 AD 1211 to 1411)",
+        "Geier and Warren 1982b, Geier and Boyer 1982"
+      ],
+      [
+        "UGa-4050",
+        "Bath",
+        "15",
+        "Noah's Ark",
+        "645 \u00b1 80 BP (cal 2 \u03c3 AD 1227 to 1431)",
+        "Geier and Warren 1982b, Geier and Boyer 1982"
+      ],
+      [
+        "UGa-4052",
+        "Bath",
+        "15",
+        "Noah's Ark",
+        "700 \u00b1 85 BP (cal 2 \u03c3 AD 1164 to 1417)",
+        "Geier and Warren 1982b, Geier and Boyer 1982"
+      ],
+      [
+        "UGa-4049",
+        "Bath",
+        "15",
+        "Noah's Ark",
+        "920 \u00b1 120 BP (cal 2 \u03c3 AD 871 to 1295)",
+        "Geier and Warren 1982b, Geier and Boyer 1982"
+      ]
+    ],
+    "page": 187
+  },
+  {
+    "title": "Table 9.1. continued",
+    "headers": [
+      "Laboratory#",
+      "County/city name",
+      "Site#",
+      "Site name",
+      "Calibrated Radiocarbon Age",
+      "Reference"
+    ],
+    "rows": [
+      [
+        "UGa-2517a",
+        "Bath",
+        "31",
+        "Hidden Valley Rock-shelter",
+        "165 \u00b1 55 BP (cal 2 \u03c3 AD 1655 to 1953)",
+        "Geier 1982:31; 179 (BA-28)"
+      ],
+      [
+        "UGa-2517b",
+        "Bath",
+        "31",
+        "Hidden Valley Rockshelter",
+        "190 \u00b1 55 BP (cal 2 \u03c3 AD 1640 to 1955)",
+        "Geier 1982:31; 179 (BA-28)"
+      ],
+      [
+        "SI-127",
+        "Bath",
+        "35",
+        "Hirsh Mound",
+        "920 \u00b1 130 BP (cal 2 \u03c3 AD 783 to 1377)",
+        "Holland 1962, 1964"
+      ],
+      [
+        "UGa-1462",
+        "Bath",
+        "39",
+        "Beaver I",
+        "435 \u00b1 90 BP (cal 2 \u03c3 AD 1311 to 1650)",
+        "Geier and Trout 1978"
+      ],
+      [
+        "Beta-227630",
+        "Bath",
+        "39",
+        "Beaver Pond",
+        "330 \u00b1 40 BP (cal 2 \u03c3 AD 1466 to 1646)",
+        "McKnight and Gallivan 2007:187"
+      ],
+      [
+        "UGa-3079",
+        "Bath",
+        "131",
+        "Tampoons Defeat",
+        "440 \u00b1 55 BP (cal 2 \u03c3 AD 1400 to 1635)",
+        "Geier and Coffey 1982, Geier and Boyer 1982"
+      ],
+      [
+        "Beta-83406",
+        "Bath",
+        "870",
+        "Little Mt. Glyph Cave",
+        "500 \u00b1 90 BP (cal 2 \u03c3 AD 1288 to 1633)",
+        "VDHR files"
+      ],
+      [
+        "Beta-83403",
+        "Bath",
+        "870",
+        "Little Mt. Glyph Cave",
+        "820 \u00b1 110 BP (cal 2 \u03c3 AD 995 to 1392)",
+        "VDHR files"
+      ],
+      [
+        "Beta-83405",
+        "Bath",
+        "870",
+        "Little Mt. Glyph Cave",
+        "980 \u00b1 120 BP (cal 2 \u03c3 AD 781 to 1268)",
+        "VDHR files"
+      ],
+      [
+        "Beta-83404",
+        "Bath",
+        "870",
+        "Little Mt. Glyph Cave",
+        "1100 \u00b1 120 BP (cal 2 \u03c3 AD 673 to 1161)",
+        "VDHR files"
+      ],
+      [
+        "SI-535",
+        "Clarke",
+        "3",
+        "Kerns",
+        "900 \u00b1 70 BP (cal 2 \u03c3 AD 1020 to 1260)",
+        "Slattery and Woodward 1992"
+      ],
+      [
+        "SI-58",
+        "Fairfax",
+        "1",
+        "Fraser",
+        "790 \u00b1 100 BP (cal 2 \u03c3 AD 1026 to 1392)",
+        "Slattery and Woodward 1992"
+      ],
+      [
+        "Beta-46954",
+        "Fairfax",
+        "544",
+        "Taft",
+        "850 \u00b1 50 BP (cal 2 \u03c3 AD 1043 to 1270)",
+        "Johnson 1988, Norton and Baird 1994"
+      ],
+      [
+        "Beta-46955",
+        "Fairfax",
+        "544",
+        "Taft",
+        "750 \u00b1 70 BP (cal 2 \u03c3 AD 1053 to 1396)",
+        "Johnson 1988, Norton and Baird 1994"
+      ],
+      [
+        "Beta-46956",
+        "Fairfax",
+        "544",
+        "Taft",
+        "360 \u00b1 130 BP (cal 2 \u03c3 AD 1309 to 1954)",
+        "Johnson 1988, Norton and Baird 1994"
+      ],
+      [
+        "AA-17229",
+        "Fairfax",
+        "544",
+        "Taft",
+        "354 \u00b1 44 BP (cal 2 \u03c3 AD 1453 to 1639)",
+        "VDHR files"
+      ],
+      [
+        "Beta-61318",
+        "Fairfax",
+        "544",
+        "Taft",
+        "390 \u00b1 60 BP (cal 2 \u03c3 AD 1434 to 1641)",
+        "Norton and Baird 1994"
+      ],
+      [
+        "Beta-46953",
+        "Fairfax",
+        "1471",
+        "Little Marsh Creek",
+        "640 \u00b1 50 BP (cal 2 \u03c3 AD 1279 to 1406)",
+        "Moore 1990:35"
+      ],
+      [
+        "Beta-34804",
+        "Fairfax",
+        "1471",
+        "Little Marsh Creek",
+        "430 \u00b1 90 BP (cal 2 \u03c3 AD 1312 to 1653)",
+        "Moore 1990:35"
+      ],
+      [
+        "Beta-49255",
+        "Fairfax",
+        "1847",
+        "Lazy Point",
+        "590 \u00b1 60 BP (cal 2 \u03c3 AD 1286 to 1430)",
+        ""
+      ],
+      [
+        "Beta-139298",
+        "Fairfax",
+        "2076",
+        "Lorton Town Center",
+        "330 \u00b1 40 BP (cal 2 \u03c3 AD 1466 to 1646)",
+        "VDHR files"
+      ],
+      [
+        "Beta-177222",
+        "Fairfax",
+        "2634",
+        "David",
+        "1210 \u00b1 40 BP (cal 2 \u03c3 AD 687 to 937)",
+        "Inashima 2006:4.13, 10.07"
+      ]
+    ],
+    "page": 188
+  },
+  {
+    "title": "Table 9.1. continued",
+    "headers": [
+      "Laboratory#",
+      "County/city name",
+      "Site#",
+      "Site name",
+      "Calibrated Radiocarbon Age",
+      "Reference"
+    ],
+    "rows": [
+      [
+        "Beta-177179",
+        "Fairfax",
+        "2634",
+        "David",
+        "1230 \u00b1 50 BP (cal 2 \u03c3 AD 669 to 934)",
+        "Inashima 2006:4.13, 10.07"
+      ],
+      [
+        "Beta-179551",
+        "Fairfax",
+        "2634",
+        "David",
+        "330 \u00b1 40 BP (cal 2 \u03c3 AD 1466 to 1646)",
+        "Inashima 2006:9.59"
+      ],
+      [
+        "Beta-244348",
+        "Fairfax",
+        "3226",
+        "Clark's Branch",
+        "1040 \u00b1 40 BP (cal 2 \u03c3 AD 893 to 1119)",
+        "Inashima 2008"
+      ],
+      [
+        "Beta-11095",
+        "Frederick",
+        "31",
+        "Otter Creek",
+        "630 \u00b1 50 BP (cal 2 \u03c3 AD 1281 to 1409)",
+        "Egloff et al.1987"
+      ],
+      [
+        "SI-137",
+        "King George",
+        "3",
+        "De Shazo",
+        "360 \u00b1 120 BP (cal 2 \u03c3 AD 1314 to 1954)",
+        "MacCord 1965"
+      ],
+      [
+        "Beta-109227",
+        "King George",
+        "105",
+        "Payne",
+        "660 \u00b1 40 BP (cal 2 \u03c3 AD 1274 to 1397)",
+        "Klein et al. 1998"
+      ],
+      [
+        "Beta-159908",
+        "Loudoun",
+        "4",
+        "Fisher",
+        "590 \u00b1 40 BP (cal 2 \u03c3 AD 1296 to 1417)",
+        "Pullins and Lewes 2001"
+      ],
+      [
+        "UGa-4470",
+        "Loudoun",
+        "4",
+        "Fisher",
+        "1025 \u00b1 70 BP (cal 2 \u03c3 AD 832 to 1186)",
+        "Slattery and Woodward 1992"
+      ],
+      [
+        "Beta-141256",
+        "Loudoun",
+        "10",
+        "Trittipoe",
+        "510 \u00b1 60 BP (cal 2 \u03c3 AD 1297 to 1485)",
+        "Hranicky and MacCord 1999"
+      ],
+      [
+        "Beta-14817",
+        "Loudoun",
+        "14",
+        "Point of Rocks",
+        "730 \u00b1 80 BP (cal 2 \u03c3 AD 1057 to 1409)",
+        "Rust 1986"
+      ],
+      [
+        "Beta-178036",
+        "Loudoun",
+        "15",
+        "Catoctin Creek",
+        "760 \u00b1 40 BP (cal 2 \u03c3 AD 1187 to 1295)",
+        "Corson 2003"
+      ],
+      [
+        "UGa-2983",
+        "Loudoun",
+        "15",
+        "Catoctin Creek",
+        "885 \u00b1 60 BP (cal 2 \u03c3 AD 1030 to 1254)",
+        "Rust 1986"
+      ],
+      [
+        "UGa-2819",
+        "Loudoun",
+        "15",
+        "Catoctin Creek",
+        "780 \u00b1 75 BP (cal 2 \u03c3 AD 1043 to 1388)",
+        "Rust 1986"
+      ],
+      [
+        "Beta-8319",
+        "Loudoun",
+        "250",
+        "Country Side",
+        "810 \u00b1 110 BP (cal 2 \u03c3 AD 1016 to 1395)",
+        "Rust 1986"
+      ],
+      [
+        "Beta-13226",
+        "Loudoun",
+        "250",
+        "Country Side",
+        "1370 \u00b1 140 BP (cal 2 \u03c3 AD 402 to 976)",
+        "Rust 1986"
+      ],
+      [
+        "Beta-6701",
+        "Loudoun",
+        "283",
+        "Lot 72",
+        "1210 \u00b1 70 BP (cal 2 \u03c3 AD 671 to 971)",
+        "Rust et al. 1983, Rust 1986"
+      ],
+      [
+        "Gx-9111",
+        "Loudoun",
+        "283",
+        "Lot 72",
+        "1580 \u00b1 415 BP (cal 2 \u03c3 537 B.C. to AD 1257)",
+        "Rust et al. 1983, Rust 1986"
+      ],
+      [
+        "Beta-27978",
+        "Loudoun",
+        "379",
+        "Indian Creek",
+        "650 \u00b1 80 BP (cal 2 \u03c3 AD 1226 to 1426)",
+        "Haynes 1990"
+      ],
+      [
+        "Beta-29491",
+        "Loudoun",
+        "379",
+        "Indian Creek",
+        "580 \u00b1 160 BP (cal 2 \u03c3 AD 1046 to 1657)",
+        "Haynes 1990"
+      ],
+      [
+        "Beta-",
+        "Loudoun",
+        "521",
+        "Dulles Wetlands",
+        "550 \u00b1 60 BP (cal 2 \u03c3 AD 1296 to 1445)",
+        "Balicki and Stevens 1994"
+      ],
+      [
+        "Beta-",
+        "Loudoun",
+        "521",
+        "Dulles Wetlands",
+        "790 \u00b1 70 BP (cal 2 \u03c3 AD 1043 to 1383)",
+        "Balicki and Stevens 1994"
+      ],
+      [
+        "Beta-205353",
+        "Page",
+        "1",
+        "Keyser Farm",
+        "480 \u00b1 40 BP (cal 2 \u03c3 AD 1327 to 1477)",
+        "Barber, Michael, personal communication, May 27, 2009"
+      ]
+    ],
+    "page": 189
+  },
+  {
+    "title": "Table 9.1. continued",
+    "headers": [
+      "Laboratory#",
+      "County/city name",
+      "Site#",
+      "Site name",
+      "Calibrated Radiocarbon Age",
+      "Reference"
+    ],
+    "rows": [
+      [
+        "Beta-205354",
+        "Page",
+        "1",
+        "Keyser Farm",
+        "530 \u00b1 60 BP (cal 2 \u03c3 AD 1296 to 1454)",
+        "Barber, Michael, personal communication, May 27, 2009"
+      ],
+      [
+        "Beta-260817",
+        "Page",
+        "1",
+        "Keyser Farm",
+        "360 \u00b1 40 BP (cal 2 \u03c3 AD 1450 to 1636)",
+        "Means and McKnight 2010"
+      ],
+      [
+        "Beta-260818",
+        "Page",
+        "1",
+        "Keyser Farm",
+        "370 \u00b1 40 BP (cal 2 \u03c3 AD 1446 to 1636)",
+        "Means and McKnight 2010"
+      ],
+      [
+        "Beta-260820",
+        "Page",
+        "1",
+        "Keyser Farm",
+        "380 \u00b1 40 BP (cal 2 \u03c3 AD 1442 to 1635)",
+        "Means and McKnight 2010"
+      ],
+      [
+        "Beta-260821",
+        "Page",
+        "1",
+        "Keyser Farm",
+        "380 \u00b1 40 BP (cal 2 \u03c3 AD 1442 to 1635)",
+        "Means and McKnight 2010"
+      ],
+      [
+        "Beta-260816",
+        "Page",
+        "1",
+        "Keyser Farm",
+        "390 \u00b1 40 BP (cal 2 \u03c3 AD 1437 to 1635)",
+        "Means and McKnight 2010"
+      ],
+      [
+        "Beta-260819",
+        "Page",
+        "1",
+        "Keyser Farm",
+        "410 \u00b1 40 BP (cal 2 \u03c3 AD 1427 to 1632)",
+        "Means and McKnight 2010"
+      ],
+      [
+        "Beta-214927",
+        "Page",
+        "1",
+        "Keyser Farm",
+        "350 \u00b1 40 BP (cal 2 \u03c3 AD 1456 to 1638)",
+        "Tolley, George, p.c. 2009"
+      ],
+      [
+        "Beta-214928",
+        "Page",
+        "1",
+        "Keyser Farm",
+        "380 \u00b1 40 BP (cal 2 \u03c3 AD 1442 to 1635)",
+        "Tolley, George, p.c. 2009"
+      ],
+      [
+        "SI-135",
+        "Shenandoah",
+        "1",
+        "Bowman",
+        "240 \u00b1 120 BP (cal 2 \u03c3 AD 1456 to 1954)",
+        "Holland 1964; MacCord 1964"
+      ],
+      [
+        "SI-136",
+        "Shenandoah",
+        "1",
+        "Bowman",
+        "310 \u00b1 120 BP (cal 2 \u03c3 AD 1416 to 1954)",
+        "Holland 1964; MacCord 1964"
+      ],
+      [
+        "Beta-56601",
+        "Shenandoah",
+        "3",
+        "Quicksburg",
+        "460 \u00b1 70 BP (cal 2 \u03c3 AD 1313 to 1635)",
+        "MacCord 1973, Klein 1994a, 1994b"
+      ],
+      [
+        "Beta-260822",
+        "Shenandoah",
+        "3",
+        "Quicksburg",
+        "250 \u00b1 40 BP (cal 2 \u03c3 AD 1513 to 1955)",
+        "Means and McKnight 2010"
+      ],
+      [
+        "Beta-104595",
+        "Stafford",
+        "2",
+        "Potomac Creek",
+        "350 \u00b1 30 BP (cal 2 \u03c3 AD 1457 to 1636)",
+        "Blanton et al. 1999"
+      ],
+      [
+        "Beta-104593",
+        "Stafford",
+        "2",
+        "Potomac Creek",
+        "730 \u00b1 30 BP (cal 2 \u03c3 AD 1224 to 1297)",
+        "Blanton et al. 1999"
+      ],
+      [
+        "Beta-104592",
+        "Stafford",
+        "2",
+        "Potomac Creek",
+        "340 \u00b1 40 BP (cal 2 \u03c3 AD 1462 to 1643)",
+        "Blanton et al. 1999"
+      ],
+      [
+        "Beta-102324",
+        "Stafford",
+        "2",
+        "Potomac Creek",
+        "410 \u00b1 50 BP (cal 2 \u03c3 AD 1421 to 1635)",
+        "Blanton et al. 1999"
+      ],
+      [
+        "Beta-102322",
+        "Stafford",
+        "2",
+        "Potomac Creek",
+        "640 \u00b1 50 BP (cal 2 \u03c3 AD 1279 to 1406)",
+        "Blanton et al. 1999"
+      ],
+      [
+        "Beta-102323",
+        "Stafford",
+        "2",
+        "Potomac Creek",
+        "540 \u00b1 60 BP (cal 2 \u03c3 AD 1296 to 1449)",
+        "Blanton et al. 1999"
+      ],
+      [
+        "Beta-102325",
+        "Stafford",
+        "2",
+        "Potomac Creek",
+        "670 \u00b1 60 BP (cal 2 \u03c3 AD 1252 to 1411)",
+        "Blanton et al. 1999"
+      ],
+      [
+        "Beta-104594",
+        "Stafford",
+        "2",
+        "Potomac Creek",
+        "990 \u00b1 70 BP (cal 2 \u03c3 AD 896 to 1211)",
+        "Blanton et al. 1999"
+      ],
+      [
+        "Beta-226809",
+        "Stafford",
+        "2",
+        "Potomac Creek",
+        "350 \u00b1 40 BP (cal 2 \u03c3 AD 1456 to 1638)",
+        "McKnight and Gallivan 2007:187"
+      ]
+    ],
+    "page": 190
+  },
+  {
+    "title": "Table 9.1. continued",
+    "headers": [
+      "Laboratory#",
+      "County/city name",
+      "Site#",
+      "Site name",
+      "Calibrated Radiocarbon Age",
+      "Reference"
+    ],
+    "rows": [
+      [
+        "Beta-7443",
+        "Warren",
+        "2",
+        "Sours Site",
+        "650 \u00b1 50 BP (cal 2 \u03c3 AD 1275 to 1405)",
+        "VDHR files"
+      ],
+      [
+        "Beta-2913",
+        "Warren",
+        "300",
+        "Cabin Run",
+        "630 \u00b1 50 BP (cal 2 \u03c3 AD 1281 to 1409)",
+        "Snyder and Fehr 1984"
+      ],
+      [
+        "Beta-2911",
+        "Warren",
+        "300",
+        "Cabin Run",
+        "700 \u00b1 60 BP (cal 2 \u03c3 AD 1218 to 1399)",
+        "Snyder and Fehr 1984"
+      ],
+      [
+        "Beta-3218",
+        "Warren",
+        "300",
+        "Cabin Run",
+        "730 \u00b1 80 BP (cal 2 \u03c3 AD 1057 to 1409)",
+        "Snyder and Fehr 1984"
+      ],
+      [
+        "Beta-2915",
+        "Warren",
+        "300",
+        "Cabin Run",
+        "820 \u00b1 80 BP (cal 2 \u03c3 AD 1031 to 1291)",
+        "Snyder and Fehr 1984"
+      ],
+      [
+        "Beta-3219",
+        "Warren",
+        "300",
+        "Cabin Run",
+        "1020 \u00b1 80 BP (cal 2 \u03c3 AD 785 to 1212)",
+        "Snyder and Fehr 1984"
+      ],
+      [
+        "Beta-2910",
+        "Warren",
+        "300",
+        "Cabin Run",
+        "260 \u00b1 100 BP (cal 2 \u03c3 AD 1449 to 1954)",
+        "Snyder and Fehr 1984"
+      ],
+      [
+        "Beta-2912",
+        "Warren",
+        "300",
+        "Cabin Run",
+        "1030 \u00b1 100 BP (cal 2 \u03c3 AD 777 to 1215)",
+        "Snyder and Fehr 1984"
+      ],
+      [
+        "Beta-3220",
+        "Warren",
+        "300",
+        "Cabin Run",
+        "740 \u00b1 120 BP (cal 2 \u03c3 AD 1036 to 1415)",
+        "Synder and Fehr 1984"
+      ],
+      [
+        "Beta-200315",
+        "Warren",
+        "329",
+        "522 Bridge",
+        "300 \u00b1 50 BP (cal 2 \u03c3 AD 1465 to 1796)",
+        "VDHR files"
+      ],
+      [
+        "DIC-1766",
+        "Westmoreland",
+        "119",
+        "White Oak Point",
+        "490 \u00b1 45 BP (cal 2 \u03c3 AD 1317 to 1478)",
+        "Waselkov 1982"
+      ],
+      [
+        "DIC-1764",
+        "Westmoreland",
+        "119",
+        "White Oak Point",
+        "640 \u00b1 50 BP (cal 2 \u03c3 AD 1279 to 1406)",
+        "Waselkov 1982"
+      ],
+      [
+        "DIC-1762",
+        "Westmoreland",
+        "119",
+        "White Oak Point",
+        "260 \u00b1 55 BP (cal 2 \u03c3 AD 1470 to 1955)",
+        "Waselkov 1982"
+      ],
+      [
+        "DIC-1767",
+        "Westmoreland",
+        "119",
+        "White Oak Point",
+        "320 \u00b1 55 BP (cal 2 \u03c3 AD 1451 to 1662)",
+        "Waselkov 1982"
+      ],
+      [
+        "DIC-1770",
+        "Westmoreland",
+        "119",
+        "White Oak Point",
+        "410 \u00b1 55 BP (cal 2 \u03c3 AD 1420 to 1635)",
+        "Waselkov 1982"
+      ],
+      [
+        "DIC-1768",
+        "Westmoreland",
+        "119",
+        "White Oak Point",
+        "610 \u00b1 55 BP (cal 2 \u03c3 AD 1284 to 1417)",
+        "Waselkov 1982"
+      ],
+      [
+        "DIC-1769",
+        "Westmoreland",
+        "119",
+        "White Oak Point",
+        "1070 \u00b1 60 BP (cal 2 \u03c3 AD 781 to 1149)",
+        "Waselkov 1982"
+      ],
+      [
+        "DIC-1763",
+        "Westmoreland",
+        "119",
+        "White Oak Point",
+        "1090 \u00b1 60 BP (cal 2 \u03c3 AD 778 to 1033)",
+        "Waselkov 1982"
+      ],
+      [
+        "SI-4374",
+        "Westmoreland",
+        "119",
+        "White Oak Point",
+        "945 \u00b1 70 BP (cal 2 \u03c3 AD 975 to 1252)",
+        "Waselkov 1982"
+      ],
+      [
+        "DIC-1765",
+        "Westmoreland",
+        "119",
+        "White Oak Point",
+        "440 \u00b1 75 BP (cal 2 \u03c3 AD 1324 to 1643)",
+        "Waselkov 1982"
+      ]
+    ],
+    "page": 191
+  }
+]
+
