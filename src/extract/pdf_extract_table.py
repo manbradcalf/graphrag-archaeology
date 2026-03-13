@@ -1,27 +1,32 @@
-import asyncio
-from kreuzberg import extract_file, ExtractionConfig, PageConfig
+from kreuzberg import extract_file_sync, ExtractionConfig, PageConfig
 
 
-async def main() -> None:
+def main() -> None:
     config = ExtractionConfig(
-        pages=PageConfig(extract_pages=True, insert_page_markers=True)
+        pages=PageConfig(extract_pages=True, insert_page_markers=True),
+        include_document_structure=True,
     )
-    result = await extract_file(
+    result = extract_file_sync(
         "pdfs/The-Archaeology-Of-Virginias-First-Peoples.pdf", config=config
     )
 
-    import re
+    print(result)
 
-    target = 97
-    pages = re.split(r"<!-- PAGE (\d+) -->", result.content)
-    # pages alternates: [pre-first-marker, "1", page1_text, "2", page2_text, ...]
-    for i in range(1, len(pages), 2):
-        if int(pages[i]) == target:
-            print(f"--- Page {target} ---")
-            print(pages[i + 1].strip())
-            break
-    else:
-        print(f"Page {target} not found")
+    content: str = result.content
+
+    table_count: int = len(result.tables)
+    metadata: dict = result.metadata
+
+    print(f"Content length: {len(content)} characters")
+    print(f"Tables: {table_count}")
+    print(f"Metadata keys: {list(metadata.keys())}")
+
+    # # Access the document tree
+    # if result.document:
+    #     for node in result.document["nodes"]:
+    #         node_type = node["content"]["node_type"]
+    #         text = node["content"].get("text", "")
+    #         print(f"[{node_type}] {text[:80]}")
 
 
-asyncio.run(main())
+main()

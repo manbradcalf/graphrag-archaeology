@@ -10,6 +10,7 @@ dependencies = [
     "graphlint",
     "kreuzberg>=4.4.5",
     "neo4j>=6.1.0",
+    "pdfplumber>=0.11.9",
     "pyright>=1.1.408",
     "sentence-transformers>=5.3.0",
     "streamlit>=1.55.0",
