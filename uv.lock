@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.12'",
@@ -92,7 +92,7 @@ dependencies = [
 requires-dist = [
     { name = "anthropic", specifier = ">=0.84.0" },
     { name = "gliner2", specifier = ">=1.2.4" },
-    { name = "graphlint", editable = "../graphlint" },
+    { name = "graphlint", editable = "../../graphlint" },
     { name = "kreuzberg", specifier = ">=4.4.5" },
     { name = "neo4j", specifier = ">=6.1.0" },
     { name = "pdfplumber", specifier = ">=0.11.9" },
@@ -500,7 +500,7 @@ wheels = [
 [[package]]
 name = "graphlint"
 version = "0.1.0"
-source = { editable = "../graphlint" }
+source = { editable = "../../graphlint" }
 dependencies = [
     { name = "fastapi" },
     { name = "jinja2" },

@@ -82,3 +82,118 @@ This is a known problem in OCR research. There are resources for building system
 Research shows ~50% of OCR errors are character substitutions, ~30% insertions/deletions, and ~10% spacing errors ([Afli et al., 2016](https://arxiv.org/pdf/1604.06225)). The state of the art for post-correction uses confusion matrices to generate correction candidates, then LLMs to pick the right one — though a [2025 paper](https://arxiv.org/html/2502.01205v1) titled *"OCR Error Post-Correction with LLMs: No Free Lunches"* shows this remains an open problem.
 
 For our pipeline, the practical path forward is to generate a confusion matrix from our specific corpus (align OCR output against known-good text for a few pages), extract the high-frequency substitution pairs, and add them to `ocr_cleanup.py`. This would catch the `}` → `y` class of errors that both the pipeline and agent currently miss.
+
+## Wait, Is This Even GraphRAG?
+
+Midway through building, we stopped and asked: what are we actually making?
+
+Standard GraphRAG — the kind you see in Neo4j tutorials and the `neo4j-graphrag-python` package — works like this: user types a question in a search box, the question gets embedded, vector search finds relevant chunks, a Cypher query fans out from those chunks into the entity graph to collect structured context, and the LLM generates an answer. The graph is invisible infrastructure that makes retrieval better. The user never sees it.
+
+What we'd been designing was the opposite. Our UI puts entity browsing first — the sidebar isn't decoration around a search box, it IS the search. Users click on "Monacan" and "Shenandoah Valley" and the system traverses the graph to find connections, pulls relevant source chunks via MENTIONS edges, and shows the evidence. The LLM synthesizes a summary, but the graph connections and source cards are the real product.
+
+This isn't RAG enhanced by a graph. It's a knowledge graph explorer with optional LLM summarization.
+
+We decided to be honest about it:
+
+- **`main` branch**: The entity-first knowledge graph explorer. The graph is the interface.
+- **`VectorCypherRetriever` branch**: Standard vanilla GraphRAG for comparison. Search box first, graph invisible, answer is the product.
+
+Same extraction pipeline, same CIDOC-CRM schema, same Neo4j storage — different interaction models on top.
+
+## Building the Extraction Pipeline
+
+With the identity crisis resolved, we built the full pipeline from PDF to populated graph. The architecture:
+
+```
+PDF → kreuzberg → regex OCR cleanup → (optional) LLM cleanup → clean markdown
+    → chunker (markdown-aware, heading/paragraph boundaries)
+    → Claude NER (SHACL-guided, section-level, not per-chunk)
+    → Claude relationship extraction (same sections, entity list as context)
+    → entity resolution (exact match → fuzzy match → flag ambiguous)
+    → Neo4j loading (entities, relationships, chunks, MENTIONS links)
+    → nomic embeddings + vector indexes
+```
+
+Some things we learned along the way:
+
+### The cleanup question is a false choice
+
+We initially skipped LLM cleanup (`--llm-cleanup`) for the extraction step, reasoning that the regex pipeline was "good enough" for book-style PDFs. Then we realized: the NER step sends every section to Sonnet anyway. If Sonnet has to read through OCR garbage (`}` for `y`, `3'ou` for `you`) while also extracting entities, we're paying Sonnet prices (~$3/M input) for cleanup work that Haiku could do for a tenth of the cost.
+
+The explicit cleanup pass costs ~$1 total and produces cleaner input for every downstream step — NER, chunking, embeddings, and eventually the user-facing source cards. We made it the default.
+
+### Chunking OCR'd documents is tricky
+
+Our markdown-aware chunker splits on heading boundaries first, then paragraphs, then sentences. Simple enough — except OCR'd documents create hundreds of tiny spurious headings. The 1833 Kercheval book produced 298 sections, 297 under 100 characters, because Tesseract interpreted running headers and page artifacts as `##` headings.
+
+First pass: 1,465 chunks for one document, mostly tiny fragments. Fix: merge sections under 100 characters into their neighbors before chunking. After: 1,228 and 1,009 chunks respectively, with reasonable size distributions.
+
+We also found a bug where the chunker mishandled documents starting with `# ` (single hash) — the preamble detection assumed any text starting with `#` was a captured regex group, misaligning all subsequent section boundaries. One document went from 298 sections to 12 chunks (losing 99% of its content). The kind of bug you only catch by actually running the pipeline on real data.
+
+### NER at scale hits rate limits
+
+784 sections across 2 documents, 5 concurrent API calls to Sonnet. The rate limiter kicked in immediately — 429 responses with 20-38 second retry waits. The Anthropic SDK handles retries gracefully, but the throughput dropped to a crawl.
+
+Worse: the pipeline saves results per-document, not per-section. If the process crashes mid-document, all completed sections for that document are lost. We're fixing this to save incrementally after the current run finishes.
+
+### GLiNER2 vs. Sonnet for NER
+
+For pure span detection (finding entity boundaries and classifying them), GLiNER2 would work fine and costs nothing. But our NER step does more than span detection:
+
+- **Alias grouping**: recognizing that "the Powhatan", "Wahunsenacah's confederacy", and "Powhatan Confederacy" are the same entity
+- **Contextual descriptions**: generating a brief description from surrounding text
+- **Coreference resolution**: resolving "they migrated south" to a specific group
+- **OCR recovery**: reading `"Pov/hatan"` as "Powhatan"
+
+The $10 API cost is paying for structured enrichment, not just NER. At scale, the hybrid approach (GLiNER2 for bulk detection, Sonnet for enrichment of ambiguous cases) would be the right call. For 2 documents, Sonnet-only is simpler.
+
+### NER results (partial)
+
+The NER step finished — sort of. It extracted 5,249 entities from the First Peoples document, then ran out of API credits partway through Kercheval. Worse: the credit errors started *during* the first book, not between books. 120 out of 411 sections silently failed and returned empty entity lists. The pipeline reported "5,249 entities" like everything was fine, but we're missing ~29% of the extractions.
+
+The silent failure is a design problem. Failed sections return `[]` and get merged into the results with no warning. The per-document save (not per-section) means there's no way to know which sections succeeded without checking the logs. Both of these need fixing before the next run.
+
+What we did get shows the approach works. 5,249 raw entity mentions across 7 types:
+
+| Type | Count |
+|---|---|
+| Places | 2,180 |
+| Artifacts | 913 |
+| Time Periods | 849 |
+| Persons | 573 |
+| Sites | 493 |
+| Cultural Groups | 191 |
+| Events | 50 |
+
+The entity resolution challenge is real though. "Carole Nash" appears 11 times — 3 as "Carole Nash", 7 as just "Nash", plus a false near-match "Paul Inashima". Our fuzzy matcher (SequenceMatcher > 0.85) won't merge "Nash" with "Carole Nash" because the ratio is too low. We need a substring/component-name rule: if one name is a component of another and they share the same entity type, merge them.
+
+### Azure Document Intelligence: maybe we overengineered this
+
+While waiting for NER to finish, we ran a head-to-head comparison between our kreuzberg + OCR cleanup pipeline and Azure Document Intelligence on the same page of the 1833 Kercheval book. The results were humbling:
+
+| Artifact | **Azure Doc Intelligence** | **Kreuzberg + OCR cleanup** |
+|---|---|---|
+| `}` as `y` | Fixed | Still broken (`part}^`, `la}'^`) |
+| Run-together words | Clean spacing | Smashed (`traditionaryinformation`) |
+| "Smith" | Correct | `Bmith` |
+| Soft hyphens | Preserved naturally | Lost or mangled |
+| Spurious headings | None | Two fake `#` headings mid-paragraph |
+| Image refs | None | Two `![Image]` artifacts |
+
+Azure produced clean, readable text from a page that Tesseract mangled. No regex cleanup needed. No LLM cleanup needed. One API call.
+
+This raised a bigger question: why are we using markdown at all? The chunker and NER splitter were built to split on `##` headings, but those headings are just kreuzberg's output format — and for OCR'd documents, they're mostly garbage (`C3ENEAL.OGY COUUECTION`, `DEOICATIOjS.`). Plain text with paragraph breaks is sufficient for chunking, NER, and embeddings. The "markdown-aware chunker" was complexity we created by treating an output format as a feature.
+
+We're adding Azure as an optional backend (`--backend cloud` vs `--backend local`). For historical scanned documents, it's the obvious choice. Kreuzberg stays as the default for offline/free usage.
+
+### What's next
+
+We ran out of API credits ($0 wallet, $100 limit — the limit is how much you *can* spend, not how much you *have*). Before adding funds and re-running:
+
+1. Fix incremental saving — per-section, not per-document, so crashes don't lose progress
+2. Track failed sections so we can re-run only what's missing instead of `--force` on everything
+3. Add the substring name-matching rule to entity resolution
+4. Add Azure Document Intelligence as an extraction backend option
+5. Then: re-run NER, relationship extraction, entity resolution, Neo4j loading, embeddings
+
+The pipeline is built. The modules are all there. We just need money in the wallet and data in the graph.
