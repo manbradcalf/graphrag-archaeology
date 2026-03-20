@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArchaeoGraph Virginia — Knowledge Graph Explorer</title>
+<style>
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #111214;
+  --bg-raised: #1a1c1f;
+  --bg-hover:  #23262b;
+  --border:    #2c2f36;
+  --text:      #d4d4d8;
+  --text-dim:  #8b8d94;
+  --accent:    #c49a6c;
+  --accent-dim:#8a6d4b;
+  --accent-bg: rgba(196,154,108,0.08);
+  --tag-bg:    #23262b;
+  --tag-active:#332a1f;
+  --source-bg: #1e2024;
+  --radius:    8px;
+  --radius-sm: 5px;
+  --font:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --mono:      'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+}
+
+html { font-size: 15px; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Layout ───────────────────────────────────────────────── */
+.app {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+header {
+  grid-column: 1 / -1;
+  padding: 28px 36px 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.header-top {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.logo span { color: var(--text-dim); font-weight: 400; }
+
+.badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-dim);
+  background: var(--accent-bg);
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+/* ── Search ───────────────────────────────────────────────── */
+.search-area { margin-bottom: 18px; }
+
+.search-box {
+  display: flex;
+  gap: 0;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.search-box:focus-within { border-color: var(--accent-dim); }
+
+.search-box input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  color: var(--text);
+  font-family: var(--font);
+  outline: none;
+}
+
+.search-box input::placeholder { color: var(--text-dim); }
+
+.search-box button {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  padding: 0 24px;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.search-box button:hover { background: #d4aa7c; }
+
+/* ── Active Filters Bar ──────────────────────────────────── */
+.active-filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  min-height: 0;
+  transition: all 0.2s ease;
+}
+
+.active-filters-bar.has-filters {
+  min-height: 32px;
+}
+
+.active-filters-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: var(--tag-active);
+  border: 1px solid var(--accent-dim);
+  border-radius: 20px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--font);
+  animation: pill-in 0.2s ease-out;
+}
+
+@keyframes pill-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.filter-pill:hover {
+  background: rgba(196,154,108,0.18);
+}
+
+.filter-pill .pill-x {
+  font-size: 0.68rem;
+  opacity: 0.6;
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.filter-pill:hover .pill-x {
+  opacity: 1;
+}
+
+.filter-pill .pill-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pill-dot.peoples  { background: #b07d4f; }
+.pill-dot.persons  { background: #c47a5a; }
+.pill-dot.sites    { background: #6b8a8a; }
+.pill-dot.places   { background: #5b8a72; }
+.pill-dot.periods  { background: #7a6fa0; }
+.pill-dot.artifacts{ background: #8a7054; }
+
+.clear-filters-btn {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.15s;
+}
+
+.clear-filters-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+}
+
+/* ── Sample Queries ───────────────────────────────────────── */
+.sample-queries {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.sample-chip {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  background: var(--tag-bg);
+  border: 1px solid transparent;
+  border-radius: 20px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--font);
+  line-height: 1.4;
+}
+
+.sample-chip:hover {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+  background: var(--accent-bg);
+}
+
+/* ── Sidebar ──────────────────────────────────────────────── */
+.sidebar {
+  padding: 24px 20px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  max-height: calc(100vh - 140px);
+  position: sticky;
+  top: 0;
+}
+
+.sidebar h3 {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin: 0 0 10px;
+  padding: 0 4px;
+}
+
+.sidebar h3:not(:first-child) { margin-top: 22px; }
+
+.sidebar-hint {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  padding: 8px 10px 14px;
+  line-height: 1.5;
+  opacity: 0.7;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+
+.entity-list { list-style: none; }
+
+.entity-item {
+  font-size: 0.82rem;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.12s;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.entity-item:hover { background: var(--bg-hover); color: var(--text); }
+
+.entity-item.active {
+  background: var(--tag-active);
+  color: var(--accent);
+}
+
+.entity-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.entity-dot.peoples  { background: #b07d4f; }
+.entity-dot.persons  { background: #c47a5a; }
+.entity-dot.sites    { background: #6b8a8a; }
+.entity-dot.places   { background: #5b8a72; }
+.entity-dot.periods  { background: #7a6fa0; }
+.entity-dot.artifacts{ background: #8a7054; }
+
+.entity-count {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  opacity: 0.5;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Results ──────────────────────────────────────────────── */
+.results {
+  padding: 28px 36px;
+  max-width: 820px;
+  overflow-y: auto;
+  max-height: calc(100vh - 140px);
+}
+
+.results-empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-dim);
+}
+
+.results-empty p { font-size: 0.95rem; margin-top: 8px; }
+
+/* Typing indicator */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 0;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.typing-dots { display: flex; gap: 4px; }
+
+.typing-dots span {
+  width: 5px; height: 5px;
+  background: var(--accent-dim);
+  border-radius: 50%;
+  animation: dot-pulse 1.2s infinite;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dot-pulse {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Answer Card ──────────────────────────────────────────── */
+.answer-card {
+  animation: fade-up 0.35s ease-out;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.answer-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.answer-meta .strategy {
+  background: var(--accent-bg);
+  color: var(--accent);
+  padding: 3px 9px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.answer-body {
+  font-size: 0.94rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.answer-body p { margin-bottom: 14px; }
+
+.answer-body .citation {
+  font-size: 0.75rem;
+  color: var(--accent);
+  vertical-align: super;
+  cursor: help;
+  font-weight: 600;
+}
+
+/* ── Sources ──────────────────────────────────────────────── */
+.sources-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.section-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.source-card {
+  background: var(--source-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.source-num {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-bg);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.source-info { flex: 1; }
+
+.source-title {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.source-detail {
+  font-size: 0.76rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.source-chunk {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 6px;
+  padding-left: 10px;
+  border-left: 2px solid var(--border);
+  line-height: 1.55;
+}
+
+/* ── Evidence Chain ───────────────────────────────────────── */
+.evidence-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.evidence-chain {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.ev-node {
+  font-size: 0.76rem;
+  padding: 5px 11px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
+.ev-node.entity {
+  background: var(--tag-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.ev-node.relation {
+  color: var(--text-dim);
+  font-size: 0.7rem;
+  font-style: italic;
+  padding: 5px 4px;
+}
+
+.ev-arrow {
+  color: var(--text-dim);
+  font-size: 0.7rem;
+  opacity: 0.4;
+}
+
+.ev-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+/* ── Graph Stats ──────────────────────────────────────────── */
+.graph-stats {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 28px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    max-height: none;
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 24px;
+  }
+  .sidebar h3 { width: 100%; margin-top: 14px !important; }
+  .sidebar-hint { width: 100%; }
+  .entity-list { display: flex; flex-wrap: wrap; gap: 4px; }
+  .entity-count { display: none; }
+  .results { padding: 20px 18px; }
+  header { padding: 20px 18px 0; }
+}
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3d44; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <header>
+    <div class="header-top">
+      <div class="logo">ArchaeoGraph <span>Virginia</span></div>
+      <div class="badge">Knowledge Graph Explorer</div>
+    </div>
+    <div class="search-area">
+      <div class="search-box">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Ask a question about Virginia archaeology..."
+        />
+        <button id="search-btn">Search</button>
+      </div>
+      <div class="active-filters-bar" id="active-filters-bar"></div>
+    </div>
+    <div class="sample-queries" id="sample-queries"></div>
+    <div style="height:14px"></div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <!-- Results -->
+  <main class="results" id="results">
+    <div class="results-empty">
+      <p>Select a sample query or click entities in the sidebar to explore the knowledge graph.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+// ─── Data ─────────────────────────────────────────────────────
+
+const ENTITIES = {
+  "Peoples & Cultures": {
+    type: "peoples",
+    items: [
+      { name: "Monacan", count: 34 },
+      { name: "Powhatan", count: 28 },
+      { name: "Siouan-speaking peoples", count: 22 },
+      { name: "Algonquian peoples", count: 19 },
+      { name: "Iroquoian groups", count: 11 },
+      { name: "Manahoac", count: 9 },
+      { name: "Tutelo", count: 7 },
+    ]
+  },
+  "Persons": {
+    type: "persons",
+    items: [
+      { name: "John Smith", count: 31 },
+      { name: "Samuel Kercheval", count: 22 },
+      { name: "Wahunsenacah", count: 15 },
+      { name: "Thomas Jefferson", count: 12 },
+      { name: "John Lederer", count: 9 },
+      { name: "William Byrd II", count: 7 },
+    ]
+  },
+  "Sites": {
+    type: "sites",
+    items: [
+      { name: "Cactus Hill", count: 24 },
+      { name: "Thunderbird", count: 19 },
+      { name: "Werowocomoco", count: 16 },
+      { name: "Flint Run", count: 14 },
+      { name: "Hatch", count: 11 },
+      { name: "Trigg", count: 9 },
+      { name: "Ely Mound", count: 7 },
+    ]
+  },
+  "Places": {
+    type: "places",
+    items: [
+      { name: "Shenandoah Valley", count: 41 },
+      { name: "James River", count: 37 },
+      { name: "Blue Ridge", count: 29 },
+      { name: "Potomac River", count: 18 },
+      { name: "Piedmont region", count: 16 },
+      { name: "Tidewater", count: 14 },
+      { name: "Great Valley", count: 12 },
+    ]
+  },
+  "Time Periods": {
+    type: "periods",
+    items: [
+      { name: "Paleoindian (15000\u201310000 BC)", count: 8 },
+      { name: "Archaic (8000\u20131200 BC)", count: 23 },
+      { name: "Woodland (1200 BC\u20131600 AD)", count: 46 },
+      { name: "Late Woodland (900\u20131600 AD)", count: 31 },
+      { name: "Contact Era (1600\u20131700)", count: 19 },
+      { name: "Colonial Period", count: 15 },
+    ]
+  },
+  "Artifact Types": {
+    type: "artifacts",
+    items: [
+      { name: "Ceramic vessels", count: 38 },
+      { name: "Projectile points", count: 33 },
+      { name: "Shell-tempered pottery", count: 21 },
+      { name: "Crushed-quartz temper ceramics", count: 17 },
+      { name: "Stone gorgets", count: 9 },
+      { name: "Bone tools", count: 12 },
+      { name: "Copper ornaments", count: 6 },
+    ]
+  }
+};
+
+// Map entity names to their type for pill coloring
+const ENTITY_TYPE_MAP = {};
+for (const [, data] of Object.entries(ENTITIES)) {
+  for (const item of data.items) {
+    ENTITY_TYPE_MAP[item.name] = data.type;
+  }
+}
+
+const QUERIES = {
+  "What archaeological evidence connects Shenandoah Valley settlements to broader Virginia native cultures?": {
+    strategy: "Graph Retrieval",
+    answer: `<p>Archaeological evidence from the Shenandoah Valley reveals deep connections between its indigenous settlements and the broader cultural networks of Virginia through material culture, trade patterns, and settlement continuity spanning thousands of years.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 4">[1]</span></p>
+<p>The most compelling evidence comes from ceramic traditions. Valley sites consistently yield crushed-quartz-tempered pottery characteristic of Siouan-speaking peoples, particularly the Monacan, whose territory extended from the Blue Ridge Piedmont into the upper James River drainage. These ceramic assemblages share decorative motifs\u2014notably cord-marked and fabric-impressed surfaces\u2014with sites along the James River corridor, suggesting sustained interaction rather than isolated development.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 6">[1]</span></p>
+<p>Trade networks further demonstrate these connections. Shell-tempered pottery fragments found at Valley sites originated from Tidewater or coastal-adjacent communities, indicating exchange relationships that crossed the Blue Ridge. Kercheval's account of Valley settlement patterns notes the presence of established trails connecting mountain communities to eastern populations, pathways that archaeology has confirmed through the distribution of non-local lithic materials and marine shell artifacts.<span class="citation" title="History of the Valley of Virginia, pp. 42-58">[2]</span></p>
+<p>Late Woodland period sites (900\u20131600 AD) in the Valley show increasing alignment with Monacan cultural patterns, including mound-building practices documented at sites along the upper James. This cultural affiliation stands in contrast to the Algonquian-speaking Powhatan chiefdom to the east, marking the Blue Ridge as a significant cultural boundary while the river valleys served as corridors of interaction.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>`,
+    sources: [
+      {
+        num: 1,
+        title: "The Archaeology of Virginia's First Peoples",
+        detail: "Chapters 4, 6, 7 \u2014 Ceramic traditions, regional interaction, Late Woodland period",
+        chunk: "The distribution of crushed-quartz-tempered ceramics across the Ridge and Valley province provides the strongest material evidence for Siouan cultural affiliation of Valley populations\u2026"
+      },
+      {
+        num: 2,
+        title: "History of the Valley of Virginia",
+        detail: "Samuel Kercheval \u2014 pp. 42\u201358, early settlement accounts and indigenous trails",
+        chunk: "The paths worn by the feet of the native inhabitants connected the waters of the Shenandoah with those of the James, traversing the gaps of the Blue Ridge at intervals known to the earliest European observers\u2026"
+      }
+    ],
+    evidence: [
+      ["Crushed-quartz temper ceramics", "located in", "Shenandoah Valley"],
+      ["Crushed-quartz temper ceramics", "affiliated with", "Siouan-speaking peoples"],
+      ["Monacan", "member of", "Siouan-speaking peoples"],
+      ["Monacan", "located in", "Blue Ridge"],
+      ["Blue Ridge", "within", "Piedmont region"],
+      ["Shell-tempered pottery", "located in", "Tidewater"],
+    ],
+    stats: { nodes: 14, relationships: 23, sources: 2 }
+  },
+
+  "How did ceramic traditions differ between Tidewater and Piedmont peoples?": {
+    strategy: "Filter Search",
+    answer: `<p>Ceramic traditions in Virginia reveal a fundamental cultural divide between the Tidewater and Piedmont regions, serving as one of the most reliable archaeological markers for distinguishing Algonquian-speaking coastal populations from Siouan-speaking interior groups.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 5">[1]</span></p>
+<p>Tidewater ceramics, produced by communities within the Powhatan chiefdom and related Algonquian peoples, are predominantly characterized by shell tempering\u2014the practice of adding crushed shell to clay to improve firing and durability. Roanoke series and Townsend series wares dominate coastal assemblages, with surface treatments including cord-marking, simple stamping, and distinctive incised decorations that reflect influence from broader Mid-Atlantic Algonquian traditions.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 5">[1]</span></p>
+<p>Piedmont ceramics stand in marked contrast. The Monacan and related Siouan-speaking peoples employed crushed quartz as the primary tempering agent, producing a visually and texturally distinct ware. Dan River and Radford series ceramics dominate the Piedmont assemblage, with surface treatments favoring cord-marking and fabric-impressing. Vessel forms also differ: Piedmont pots tend toward wider orifices and more globular bodies compared to Tidewater forms.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 6">[1]</span></p>
+<p>The boundary between these traditions is not absolute. Sites in the Fall Line zone\u2014where the Piedmont meets the coastal plain\u2014yield mixed assemblages, suggesting trade, interaction, or overlapping territorial use during the Late Woodland period.<span class="citation" title="History of the Valley of Virginia, pp. 31-39">[2]</span></p>`,
+    sources: [
+      {
+        num: 1,
+        title: "The Archaeology of Virginia's First Peoples",
+        detail: "Chapters 5\u20136 \u2014 Ceramic typology, regional variation",
+        chunk: "Shell tempering appears almost exclusively east of the Fall Line, while crushed-quartz tempering dominates assemblages from the Piedmont westward through the Blue Ridge\u2026"
+      },
+      {
+        num: 2,
+        title: "History of the Valley of Virginia",
+        detail: "Samuel Kercheval \u2014 pp. 31\u201339, observations on native material culture",
+        chunk: "Among the relics found in the earth are fragments of vessels of pottery, rudely fashioned yet serviceable, differing in their composition from those described by the eastern chroniclers\u2026"
+      }
+    ],
+    evidence: [
+      ["Powhatan", "located in", "Tidewater"],
+      ["Shell-tempered pottery", "located in", "Tidewater"],
+      ["Monacan", "located in", "Piedmont region"],
+      ["Crushed-quartz temper ceramics", "located in", "Piedmont region"],
+      ["Shell-tempered pottery", "documented in", "The Archaeology of Virginia's First Peoples"],
+    ],
+    stats: { nodes: 9, relationships: 14, sources: 2 }
+  },
+
+  "What do we know about Monacan settlement patterns along the James River?": {
+    strategy: "Filter Search",
+    answer: `<p>The Monacan people occupied a substantial territory along the upper James River and its tributaries, with settlement patterns that archaeological and ethnohistorical evidence increasingly reveals as more complex and politically organized than early colonial accounts suggested.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>Settlement sites cluster along the James River from the Fall Line near present-day Richmond westward through the Blue Ridge, with major concentrations in the Piedmont between the Rivanna and James confluences. These villages were typically situated on river terraces above the floodplain, providing access to rich alluvial soils for maize agriculture while remaining above seasonal flooding. Site sizes vary considerably, suggesting a settlement hierarchy that included both larger semi-permanent villages and smaller seasonal camps.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>The most distinctive feature of Monacan settlement is the presence of accretional burial mounds, documented at multiple sites along the upper James. These mounds, built up over generations through repeated burial events, indicate long-term place attachment and a ceremonial landscape tied to specific locations. Their distribution along the James River corridor suggests that the river served not merely as a resource base but as a cultural and spiritual axis for Monacan society.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>Kercheval's early nineteenth-century account corroborates the archaeological picture, noting that European settlers in the Valley encountered evidence of substantial former habitations along the principal waterways, including cleared fields reverting to forest and the remains of semi-permanent structures.<span class="citation" title="History of the Valley of Virginia, pp. 44-52">[2]</span></p>`,
+    sources: [
+      {
+        num: 1,
+        title: "The Archaeology of Virginia's First Peoples",
+        detail: "Chapter 7 \u2014 Late Woodland Monacan settlement and social organization",
+        chunk: "Monacan villages along the upper James were organized around accretional burial mounds that served as focal points for community identity across multiple generations\u2026"
+      },
+      {
+        num: 2,
+        title: "History of the Valley of Virginia",
+        detail: "Samuel Kercheval \u2014 pp. 44\u201352, traces of indigenous habitation",
+        chunk: "Upon the fertile bottoms of the river, the first settlers found extensive tracts bearing every indication of former cultivation by a numerous people, long since departed from these lands\u2026"
+      }
+    ],
+    evidence: [
+      ["Monacan", "located in", "James River"],
+      ["James River", "within", "Piedmont region"],
+      ["Monacan", "member of", "Siouan-speaking peoples"],
+      ["Crushed-quartz temper ceramics", "affiliated with", "Monacan"],
+      ["Piedmont region", "within", "Blue Ridge"],
+    ],
+    stats: { nodes: 11, relationships: 18, sources: 2 }
+  },
+
+  "What happened to indigenous populations during the Contact Era in Virginia?": {
+    strategy: "Graph Retrieval",
+    answer: `<p>The Contact Era in Virginia (roughly 1570\u20131700) brought catastrophic disruption to indigenous populations through a convergence of epidemic disease, colonial violence, territorial displacement, and the collapse of long-standing political and economic systems.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>
+<p>The Powhatan chiefdom, the most politically complex indigenous polity in the Tidewater region, bore the earliest and most sustained impact. The establishment of Jamestown in 1607 initiated a pattern of escalating conflict punctuated by periods of uneasy coexistence. The Anglo-Powhatan Wars (1610\u20131614, 1622\u20131632, 1644\u20131646) progressively reduced Powhatan territorial control, culminating in the 1646 treaty that confined allied tribes to lands north of the York River. Archaeological evidence from this period shows abrupt changes in settlement patterns: villages relocated away from English-occupied areas, site sizes decreased, and traditional ceramic production declined as trade goods increasingly entered native assemblages.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>
+<p>Interior populations experienced contact differently but no less devastatingly. The Monacan and related Siouan-speaking groups of the Piedmont and Blue Ridge initially had less direct interaction with English colonists, but were profoundly affected by epidemic diseases that spread along the same trade networks that had previously connected Virginia's diverse populations. By the late seventeenth century, Monacan communities had contracted significantly, with many groups migrating southward or consolidating with related peoples such as the Tutelo.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>
+<p>Kercheval's account of the Valley records the resulting landscape: by the time European settlers reached the Shenandoah in the 1720s and 1730s, they found a region largely depopulated of permanent native settlements, though it remained actively used as hunting territory and was traversed by the Great Warriors' Path connecting northern and southern indigenous nations.<span class="citation" title="History of the Valley of Virginia, pp. 55-72">[2]</span></p>`,
+    sources: [
+      {
+        num: 1,
+        title: "The Archaeology of Virginia's First Peoples",
+        detail: "Chapter 8 \u2014 Contact period transformations and population decline",
+        chunk: "Archaeological signatures of the Contact period include the rapid appearance of European trade goods in native contexts, contraction of settlement size, and eventual abandonment of sites occupied continuously for centuries\u2026"
+      },
+      {
+        num: 2,
+        title: "History of the Valley of Virginia",
+        detail: "Samuel Kercheval \u2014 pp. 55\u201372, depopulation and early European settlement",
+        chunk: "When the first adventurers from the eastern settlements crossed the Blue Ridge, they found the Valley a vast and silent wilderness, bearing traces of its former inhabitants but presenting no obstacle of native opposition to their taking possession\u2026"
+      }
+    ],
+    evidence: [
+      ["Contact Era (1600\u20131700)", "involved", "Powhatan"],
+      ["Powhatan", "located in", "Tidewater"],
+      ["Contact Era (1600\u20131700)", "involved", "Monacan"],
+      ["Monacan", "member of", "Tutelo"],
+      ["Contact Era (1600\u20131700)", "took place at", "Shenandoah Valley"],
+      ["Contact Era (1600\u20131700)", "documented in", "History of the Valley of Virginia"],
+    ],
+    stats: { nodes: 16, relationships: 27, sources: 2 }
+  }
+};
+
+// ─── Filter-based mock responses ──────────────────────────────
+
+const FILTER_RESPONSES = {
+  // Single time periods
+  "Woodland (1200 BC\u20131600 AD)": {
+    strategy: "Filter Search \u2014 Period Overview",
+    answer: `<p>The Woodland period (1200 BC\u20131600 AD) represents the longest and most transformative era in Virginia archaeology, encompassing the adoption of ceramics, the development of agriculture, the emergence of complex social organization, and the flourishing of distinct regional cultural traditions.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 5\u20137">[1]</span></p>
+<p>Early Woodland communities (1200\u2013500 BC) are marked by the first appearance of pottery in the archaeological record, alongside continued reliance on hunting and gathering. Steatite-tempered and sand-tempered wares characterize the earliest assemblages. Settlement patterns suggest small, mobile groups utilizing a seasonal round of resource extraction across diverse ecological zones.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 5">[1]</span></p>
+<p>The Middle Woodland (500 BC\u2013900 AD) saw increasing sedentism and the beginnings of horticultural experimentation. Sites from this period are more substantial, with evidence of storage facilities and longer-term occupation. Interaction networks expanded, as evidenced by exotic materials appearing at Virginia sites\u2014including Ohio Valley-sourced mica and marine shell from the coast.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 6">[1]</span></p>
+<p>The Late Woodland (900\u20131600 AD) brought the most dramatic changes: full-scale maize agriculture, rapid population growth, the emergence of fortified villages, and the crystallization of the cultural identities\u2014Powhatan, Monacan, Manahoac\u2014that Europeans would encounter at contact. Ceramic traditions diversified sharply along the Tidewater/Piedmont divide, and political complexity reached its peak with the Powhatan paramount chiefdom in the east.<span class="citation" title="History of the Valley of Virginia, pp. 28\u201345">[2]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapters 5\u20137 \u2014 Woodland period overview", chunk: "The Woodland period witnessed the most profound transformations in native lifeways, from the first tentative experiments with fired clay vessels to the complex chiefdoms that greeted European arrival\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 pp. 28\u201345, pre-contact landscape", chunk: "The evidences of a numerous and settled population are everywhere apparent in the remains scattered across the Valley\u2026" }
+    ],
+    evidence: [
+      ["Late Woodland (900\u20131600 AD)", "dated to", "Woodland (1200 BC\u20131600 AD)"],
+      ["Ceramic vessels", "dated to", "Woodland (1200 BC\u20131600 AD)"],
+      ["Powhatan", "dated to", "Late Woodland (900\u20131600 AD)"],
+      ["Monacan", "dated to", "Late Woodland (900\u20131600 AD)"],
+      ["Shell-tempered pottery", "documented in", "The Archaeology of Virginia's First Peoples"],
+      ["Crushed-quartz temper ceramics", "documented in", "The Archaeology of Virginia's First Peoples"],
+    ],
+    stats: { nodes: 18, relationships: 31, sources: 2 }
+  },
+
+  // People + Place: Monacan + Shenandoah Valley
+  "Monacan|Shenandoah Valley": {
+    strategy: "Filter Search \u2014 People + Place",
+    answer: `<p>The Monacan presence in the Shenandoah Valley represents the western extent of a Siouan-speaking cultural sphere centered along the upper James River and its tributaries. While the core of Monacan territory lay in the Piedmont east of the Blue Ridge, archaeological and ethnohistorical evidence indicates significant connections to Valley populations.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>Ceramic evidence provides the strongest link. Sites throughout the Shenandoah Valley yield crushed-quartz-tempered pottery indistinguishable from Monacan assemblages along the James River. The consistency of decorative techniques\u2014cord-marked and fabric-impressed surfaces in Dan River and Radford series styles\u2014suggests that Valley populations shared cultural affiliation with Piedmont Monacan communities rather than representing an independent tradition.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 6">[1]</span></p>
+<p>The Blue Ridge, while a significant physiographic barrier, was regularly traversed via gaps that connected Monacan communities on both sides. Trade goods, ceramic styles, and likely kinship networks flowed through these corridors, maintaining cultural unity across the mountain divide. The Monacan relationship to the Valley may have been seasonal for some groups, with mountain camps serving as warm-season hunting and gathering stations linked to more permanent Piedmont villages.<span class="citation" title="History of the Valley of Virginia, pp. 42\u201358">[2]</span></p>
+<p>By the time of European contact, the Valley's Monacan-affiliated populations had been significantly reduced, likely by the same epidemic diseases and political pressures that disrupted communities throughout the Virginia interior during the seventeenth century.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapters 6\u20138 \u2014 Monacan cultural sphere and western connections", chunk: "The ceramic signature of Siouan-speaking peoples extends well beyond the Piedmont heartland, reaching into the Ridge and Valley province through the mountain gaps\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 pp. 42\u201358, mountain passages and native trails", chunk: "The mountain gaps afforded easy communication between the peoples of the Valley and those inhabiting the eastern slopes and piedmont country\u2026" }
+    ],
+    evidence: [
+      ["Monacan", "located in", "Shenandoah Valley"],
+      ["Shenandoah Valley", "within", "Blue Ridge"],
+      ["Piedmont region", "within", "Blue Ridge"],
+      ["Crushed-quartz temper ceramics", "affiliated with", "Monacan"],
+      ["Crushed-quartz temper ceramics", "located in", "Shenandoah Valley"],
+    ],
+    stats: { nodes: 10, relationships: 16, sources: 2 }
+  },
+
+  // Single artifact: Projectile points
+  "Projectile points": {
+    strategy: "Filter Search \u2014 Artifact Focus",
+    answer: `<p>Projectile points constitute the most abundant and chronologically diagnostic artifact class in Virginia archaeology, serving as the primary tool for dating sites and tracking cultural change across thousands of years of indigenous occupation.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 3\u20134">[1]</span></p>
+<p>The earliest points in Virginia\u2014Clovis and related fluted forms dating to the Paleoindian period (roughly 15000\u201310000 BC)\u2014are found across the state but cluster notably along major river drainages including the Shenandoah Valley and the James River corridor. These finely crafted bifacial tools were designed for large game hunting and represent some of the most technologically sophisticated stone working in the Eastern Woodlands.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 3">[1]</span></p>
+<p>Archaic period points (8000\u20131200 BC) show dramatic diversification in form and material. Side-notched, corner-notched, and stemmed varieties proliferate, reflecting both functional adaptation and regional cultural identity. The shift from lanceolate to notched forms tracks the transition from large game hunting to a broader subsistence base emphasizing deer, small game, and plant resources.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 4">[1]</span></p>
+<p>Woodland period points become progressively smaller, culminating in the triangular arrow points that dominate Late Woodland assemblages after the adoption of bow-and-arrow technology around 900 AD. These small, expedient points contrast markedly with the carefully crafted Archaic forms, reflecting a fundamental shift in hunting technology and weaponry. Kercheval's account notes the abundance of "arrowheads" encountered by early Valley settlers, describing fields littered with stone points exposed by plowing.<span class="citation" title="History of the Valley of Virginia, pp. 33\u201340">[2]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapters 3\u20134 \u2014 Lithic technology and projectile point typology", chunk: "The projectile point sequence of Virginia provides the fundamental chronological framework for understanding cultural change from the earliest human occupation through European contact\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 pp. 33\u201340, surface finds and native implements", chunk: "The plough turns up from the soil an abundance of arrow-heads, fashioned with great skill from flint and other hard stones, in every field along the river bottoms\u2026" }
+    ],
+    evidence: [
+      ["Projectile points", "dated to", "Paleoindian (15000\u201310000 BC)"],
+      ["Projectile points", "dated to", "Archaic (8000\u20131200 BC)"],
+      ["Projectile points", "dated to", "Woodland (1200 BC\u20131600 AD)"],
+      ["Projectile points", "located in", "Shenandoah Valley"],
+      ["Projectile points", "located in", "James River"],
+    ],
+    stats: { nodes: 12, relationships: 19, sources: 2 }
+  },
+
+  // People + Place + Period: Monacan + Shenandoah Valley + Woodland
+  "Monacan|Shenandoah Valley|Woodland (1200 BC\u20131600 AD)": {
+    strategy: "Filter Search \u2014 Multi-Entity Intersection",
+    answer: `<p>The intersection of Monacan cultural presence, the Shenandoah Valley landscape, and the Woodland period reveals a story of expanding Siouan influence westward across the Blue Ridge, driven by agricultural intensification and the consolidation of regional identities during the Late Woodland.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 6\u20137">[1]</span></p>
+<p>During the Early and Middle Woodland (1200 BC\u2013900 AD), Valley sites show a gradual transition from broadly shared ceramic traditions to styles more closely aligned with Piedmont Siouan assemblages. Crushed-quartz tempering becomes dominant, and vessel forms and decorative techniques increasingly mirror those found at Monacan sites along the upper James. This ceramic convergence suggests that by the Middle Woodland, populations on both sides of the Blue Ridge shared a common cultural identity.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 6">[1]</span></p>
+<p>The Late Woodland period (900\u20131600 AD) brought the most intensive Monacan-affiliated occupation of the Shenandoah Valley. Maize agriculture expanded settlement possibilities, and village sites on the Valley floor grew larger and more permanent. The presence of Dan River series ceramics at these sites firmly links them to the broader Monacan sphere. However, Valley settlements appear to lack the burial mounds characteristic of core Monacan territory along the James, possibly indicating a peripheral or seasonally occupied position within the larger polity.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>Kercheval recorded that early European settlers in the 1720s\u20131730s found extensive evidence of prior cultivation and habitation in the Valley, consistent with substantial Late Woodland agricultural communities that had been abandoned or drastically reduced in the decades following European contact.<span class="citation" title="History of the Valley of Virginia, pp. 44\u201358">[2]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapters 6\u20137 \u2014 Monacan cultural expansion and Woodland period settlement", chunk: "The westward extension of Siouan ceramic traditions across the Blue Ridge during the Woodland period reflects a cultural frontier that was dynamic rather than fixed\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 pp. 44\u201358, traces of prior habitation", chunk: "The evidence of former cultivation was everywhere apparent to the first settlers, who found clearings reverting to second growth and the remains of habitations along the principal watercourses\u2026" }
+    ],
+    evidence: [
+      ["Monacan", "located in", "Shenandoah Valley"],
+      ["Monacan", "dated to", "Woodland (1200 BC\u20131600 AD)"],
+      ["Crushed-quartz temper ceramics", "located in", "Shenandoah Valley"],
+      ["Crushed-quartz temper ceramics", "affiliated with", "Monacan"],
+      ["Shenandoah Valley", "within", "Blue Ridge"],
+      ["Piedmont region", "within", "Blue Ridge"],
+    ],
+    stats: { nodes: 13, relationships: 22, sources: 2 }
+  },
+
+  // Powhatan + Tidewater
+  "Powhatan|Tidewater": {
+    strategy: "Filter Search \u2014 People + Place",
+    answer: `<p>The Powhatan paramount chiefdom and the Tidewater region are inseparable in Virginia's archaeological and historical record. The chiefdom, led by Wahunsenacawh (known to the English as "Powhatan"), represented the most complex indigenous political organization on the Eastern Seaboard at the time of European contact, encompassing roughly 30 constituent tribes across the Coastal Plain.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7\u20138">[1]</span></p>
+<p>Archaeological evidence reveals that Powhatan Tidewater settlements were typically situated along navigable waterways\u2014the James, York, Rappahannock, and Potomac rivers and their tributaries. Villages ranged from small hamlets of a few households to larger towns with longhouses, palisade fortifications, and specialized activity areas. Shell-tempered pottery dominates the ceramic assemblage, distinguishing Tidewater sites sharply from Piedmont Siouan communities to the west.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>The Tidewater environment shaped Powhatan subsistence: estuarine resources\u2014oysters, fish, migratory waterfowl\u2014supplemented maize agriculture and deer hunting, creating a diverse and productive food base that supported relatively dense populations. Shell middens at Tidewater sites attest to the importance of Chesapeake Bay resources over centuries of occupation.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>The Contact Era brought devastating change. English settlement at Jamestown in 1607 initiated decades of conflict that progressively reduced Powhatan territorial control within their Tidewater homeland, a process documented in both the historical record and the archaeological evidence of site abandonment and material culture disruption.<span class="citation" title="History of the Valley of Virginia, pp. 55\u201365">[2]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapters 7\u20138 \u2014 Powhatan chiefdom and Contact period", chunk: "The Powhatan paramount chiefdom controlled a territory encompassing the Virginia Tidewater, unified under a system of tributary relationships and chiefly authority unprecedented in the region\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 pp. 55\u201365, eastern Virginia context", chunk: "The powerful confederacy of the eastern Indians, known by the name of their paramount chief, had by the early eighteenth century been reduced to a shadow of its former extent\u2026" }
+    ],
+    evidence: [
+      ["Powhatan", "located in", "Tidewater"],
+      ["Shell-tempered pottery", "located in", "Tidewater"],
+      ["Shell-tempered pottery", "affiliated with", "Powhatan"],
+      ["Powhatan", "documented in", "The Archaeology of Virginia's First Peoples"],
+      ["Contact Era (1600\u20131700)", "involved", "Powhatan"],
+    ],
+    stats: { nodes: 11, relationships: 17, sources: 2 }
+  },
+
+  // Contact Era
+  "Contact Era (1600\u20131700)": {
+    strategy: "Filter Search \u2014 Period Overview",
+    answer: `<p>The Contact Era (1600\u20131700) marks the most disruptive century in Virginia's indigenous history, as European colonization fundamentally transformed the demographic, political, and cultural landscape that had developed over millennia.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>
+<p>The era's archaeological signature is unmistakable: the sudden appearance of European trade goods\u2014glass beads, copper and brass items, iron tools\u2014in indigenous contexts, accompanied by shifts in settlement location, decreasing site size, and the gradual decline of traditional ceramic production. These material changes reflect the broader upheaval of epidemic disease, warfare, and territorial displacement that reshaped native Virginia.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>
+<p>In the Tidewater, the Powhatan chiefdom bore the full force of English expansion after 1607. Three Anglo-Powhatan Wars progressively confined indigenous populations to shrinking territories. In the interior, Monacan and Manahoac communities experienced indirect but devastating effects through disease transmission along trade routes, leading to population collapse and eventual southward migration by the late 1600s.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>
+<p>The Shenandoah Valley was effectively depopulated of permanent indigenous settlements by the early eighteenth century, though it remained part of the Great Warriors' Path travel corridor used by Iroquoian and other northern groups. Kercheval documents the eerie landscape the first European settlers encountered: abundant evidence of former habitation but no resident native population.<span class="citation" title="History of the Valley of Virginia, pp. 55\u201372">[2]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapter 8 \u2014 Contact period transformations", chunk: "The archaeological record of the Contact period is defined by disruption: the intrusion of European materials into native assemblages signals the beginning of irreversible cultural transformation\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 pp. 55\u201372, post-contact depopulation", chunk: "The Valley, once sustaining a considerable native population, was found by the first white adventurers to be a depopulated wilderness\u2026" }
+    ],
+    evidence: [
+      ["Contact Era (1600\u20131700)", "involved", "Powhatan"],
+      ["Contact Era (1600\u20131700)", "involved", "Monacan"],
+      ["Contact Era (1600\u20131700)", "involved", "Manahoac"],
+      ["Contact Era (1600\u20131700)", "took place at", "Shenandoah Valley"],
+      ["Monacan", "member of", "Tutelo"],
+    ],
+    stats: { nodes: 14, relationships: 24, sources: 2 }
+  },
+
+  // Archaic period
+  "Archaic (8000\u20131200 BC)": {
+    strategy: "Filter Search \u2014 Period Overview",
+    answer: `<p>The Archaic period (8000\u20131200 BC) spans the longest single cultural epoch in Virginia's prehistory, witnessing the transition from Pleistocene big-game hunting to the diversified subsistence strategies that would characterize native life for millennia.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 4">[1]</span></p>
+<p>Early Archaic populations (8000\u20136000 BC) adapted to the warming post-glacial environment by broadening their resource base to include deer, small mammals, freshwater mussels, and a widening range of plant foods. Corner-notched and bifurcate-based projectile points characterize this period, with sites distributed along major river valleys throughout the state\u2014the Shenandoah, James, Potomac, and their tributaries all show Early Archaic occupation.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 4">[1]</span></p>
+<p>The Middle and Late Archaic (6000\u20131200 BC) brought increasing population density, reduced mobility, and the first hints of territorial identity expressed through regional projectile point styles. Ground stone tools\u2014mortars, pestles, and axes\u2014appear in greater numbers, reflecting intensified plant processing. The Late Archaic introduction of steatite (soapstone) vessels foreshadows the ceramic revolution of the subsequent Woodland period.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 4">[1]</span></p>
+<p>Kercheval's observations of surface artifacts in the Shenandoah Valley\u2014abundant stone tools and "spearheads" of various sizes\u2014likely include many Archaic specimens, reflecting the deep time-depth of human occupation in the region.<span class="citation" title="History of the Valley of Virginia, pp. 30\u201336">[2]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapter 4 \u2014 Archaic period adaptations", chunk: "The Archaic period represents the longest sustained cultural adaptation in Virginia, as populations adjusted to post-Pleistocene environments through increasingly sophisticated exploitation of diverse resources\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 pp. 30\u201336, stone artifacts", chunk: "The variety and abundance of stone implements found throughout the Valley attest to its long occupation by peoples skilled in the working of flint and other materials\u2026" }
+    ],
+    evidence: [
+      ["Woodland (1200 BC\u20131600 AD)", "dated to", "Archaic (8000\u20131200 BC)"],
+      ["Projectile points", "dated to", "Archaic (8000\u20131200 BC)"],
+      ["Archaic (8000\u20131200 BC)", "took place at", "Shenandoah Valley"],
+      ["Archaic (8000\u20131200 BC)", "took place at", "James River"],
+      ["Archaic (8000\u20131200 BC)", "documented in", "The Archaeology of Virginia's First Peoples"],
+    ],
+    stats: { nodes: 10, relationships: 15, sources: 2 }
+  },
+
+  // Ceramic vessels (single artifact)
+  "Ceramic vessels": {
+    strategy: "Filter Search \u2014 Artifact Focus",
+    answer: `<p>Ceramic vessels are the single most informative artifact class for understanding cultural identity, regional interaction, and chronological change in Virginia archaeology from the Woodland period onward. Their introduction around 1200 BC marks a technological revolution that fundamentally altered food preparation, storage, and the material expression of group identity.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 5">[1]</span></p>
+<p>Virginia's ceramic traditions split along a fundamental geographic and cultural divide. East of the Fall Line, Algonquian-speaking peoples\u2014most notably the Powhatan\u2014produced shell-tempered pottery, using crushed mussel or oyster shell as tempering material. Roanoke and Townsend series wares dominate Tidewater assemblages, with distinctive surface treatments including cord-marking, simple stamping, and incised geometric designs.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 5">[1]</span></p>
+<p>West of the Fall Line, Siouan-speaking peoples including the Monacan employed crushed quartz as the primary tempering agent. Dan River and Radford series ceramics characterize the Piedmont and Blue Ridge assemblages, with cord-marking and fabric-impressing as the dominant surface treatments. These wares extend into the Shenandoah Valley, linking Valley populations to the broader Monacan cultural sphere.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 6">[1]</span></p>
+<p>The boundary between these traditions was permeable: Fall Line sites yield mixed assemblages, and occasional shell-tempered sherds appear at Piedmont sites (and vice versa), documenting the trade and interaction that connected Virginia's diverse populations throughout the Woodland period.<span class="citation" title="History of the Valley of Virginia, pp. 31\u201339">[2]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapters 5\u20136 \u2014 Ceramic traditions and cultural identity", chunk: "Ceramic analysis provides the most reliable means of distinguishing the cultural affiliations of Virginia's late prehistoric populations\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 pp. 31\u201339, native pottery observations", chunk: "Fragments of earthen vessels are found in great abundance, differing in their composition and ornamentation according to the district in which they are discovered\u2026" }
+    ],
+    evidence: [
+      ["Shell-tempered pottery", "documented in", "The Archaeology of Virginia's First Peoples"],
+      ["Crushed-quartz temper ceramics", "documented in", "The Archaeology of Virginia's First Peoples"],
+      ["Shell-tempered pottery", "affiliated with", "Powhatan"],
+      ["Crushed-quartz temper ceramics", "affiliated with", "Monacan"],
+      ["Ceramic vessels", "dated to", "Woodland (1200 BC\u20131600 AD)"],
+    ],
+    stats: { nodes: 11, relationships: 18, sources: 2 }
+  },
+
+  // Monacan + James River
+  "Monacan|James River": {
+    strategy: "Filter Search \u2014 People + Place",
+    answer: `<p>The James River was the geographic and cultural axis of Monacan civilization, providing the primary corridor along which Monacan communities established villages, burial grounds, agricultural fields, and the trade routes that connected them to the wider indigenous world of Virginia.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>Archaeological survey and excavation have documented a dense concentration of Monacan-affiliated sites along the upper James from the Fall Line westward through the Blue Ridge. Settlement favored river terraces above the floodplain\u2014positions offering rich alluvial soils for maize cultivation, access to riverine resources, and protection from seasonal flooding. The largest sites suggest semi-permanent villages of substantial size, while smaller camps indicate seasonal resource extraction along tributary streams.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>The James River corridor's most distinctive Monacan features are accretional burial mounds, documented at sites including the Thomas Jefferson Mound near Charlottesville. These mounds, built up through repeated interment over generations, served as enduring markers of community identity and territorial claim. Their consistent placement along the James suggests the river held deep ceremonial and spiritual significance beyond its practical utility.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>Material culture from these sites\u2014crushed-quartz-tempered ceramics, triangular arrow points, stone and bone tools\u2014represents a coherent cultural assemblage that persisted from the Middle Woodland through the Contact period, when European diseases and colonial pressure forced the surviving Monacan to abandon their James River homeland.<span class="citation" title="History of the Valley of Virginia, pp. 44\u201352">[2]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapter 7 \u2014 Monacan settlement and the James River corridor", chunk: "The James River served as the principal axis of Monacan settlement, with major villages and burial mounds distributed along the upper reaches from the Fall Line to the Blue Ridge\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 pp. 44\u201352, river corridor habitation", chunk: "Along the banks of the greater rivers the traces of former habitation are most numerous and extensive\u2026" }
+    ],
+    evidence: [
+      ["Monacan", "located in", "James River"],
+      ["James River", "within", "Piedmont region"],
+      ["Monacan", "located in", "James River"],
+      ["Crushed-quartz temper ceramics", "affiliated with", "Monacan"],
+      ["James River", "within", "Blue Ridge"],
+    ],
+    stats: { nodes: 10, relationships: 16, sources: 2 }
+  },
+
+  // Siouan-speaking peoples + Blue Ridge
+  "Siouan-speaking peoples|Blue Ridge": {
+    strategy: "Filter Search \u2014 People + Place",
+    answer: `<p>The Blue Ridge Mountains formed a central landscape feature for Siouan-speaking peoples in Virginia, serving simultaneously as a territorial marker, a resource zone, and a corridor connecting communities on both flanks of the mountain chain.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 6\u20137">[1]</span></p>
+<p>The principal Siouan groups associated with the Blue Ridge include the Monacan, whose territory straddled the range from the Piedmont to the upper Shenandoah Valley, and the Manahoac, who occupied the northern Piedmont and adjacent mountain areas. Both groups are identified archaeologically by their use of crushed-quartz-tempered ceramics, distinguishing them from the shell-tempering Algonquian traditions of the Coastal Plain to the east.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 6">[1]</span></p>
+<p>Mountain gaps through the Blue Ridge\u2014such as those along the upper James, Roanoke, and Rappahannock drainages\u2014served as critical routes for trade, communication, and seasonal migration. Archaeological evidence from gap-adjacent sites shows material culture consistent with both Valley and Piedmont Siouan traditions, confirming these passages as active cultural corridors rather than barriers.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>The Blue Ridge itself provided important lithic resources, including quartzite and rhyolite used for tool manufacture, as well as diverse plant and animal resources exploited through seasonal hunting and gathering camps at higher elevations.<span class="citation" title="History of the Valley of Virginia, pp. 38\u201348">[2]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapters 6\u20137 \u2014 Siouan cultural geography and the Blue Ridge", chunk: "The Blue Ridge served not as a boundary between separate peoples but as a spine connecting related Siouan communities on its eastern and western slopes\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 pp. 38\u201348, mountain geography and native use", chunk: "The ridges of the Blue Mountain afforded the native inhabitants both a hunting ground of great extent and the materials for their implements of stone\u2026" }
+    ],
+    evidence: [
+      ["Monacan", "member of", "Siouan-speaking peoples"],
+      ["Manahoac", "member of", "Siouan-speaking peoples"],
+      ["Monacan", "located in", "Blue Ridge"],
+      ["Piedmont region", "within", "Blue Ridge"],
+      ["Shenandoah Valley", "within", "Blue Ridge"],
+    ],
+    stats: { nodes: 9, relationships: 14, sources: 2 }
+  },
+
+  // ─── Sites ──────────────────────────────────────────────────
+
+  // Cactus Hill (single site)
+  "Cactus Hill": {
+    strategy: "Filter Search \u2014 Site Focus",
+    answer: `<p>Cactus Hill, located along the Nottoway River in Sussex County, is one of the most significant and controversial archaeological sites in eastern North America. Excavations beginning in the 1990s revealed stratified deposits with cultural materials below the well-established Clovis horizon, suggesting human occupation of Virginia as early as 18,000\u201320,000 years ago.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 3">[1]</span></p>
+<p>The pre-Clovis levels at Cactus Hill yielded small blade-like tools and projectile points distinct from classic Clovis forms, associated with a radiocarbon date cluster around 15,000\u201316,000 BC. These finds challenged the long-standing "Clovis First" model of New World colonization and placed Virginia at the center of debates about the timing and routes of initial human migration into the Americas.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 3">[1]</span></p>
+<p>Above the pre-Clovis levels, the site contains a well-preserved Clovis occupation with classic fluted points and associated debitage, followed by Archaic and Woodland period components. This unbroken stratigraphic sequence makes Cactus Hill uniquely valuable for understanding cultural continuity and change across the full span of Virginia's human occupation.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 3">[1]</span></p>
+<p>The site's sandy, well-drained soils along the Nottoway River terrace provided exceptional preservation conditions, and its multi-component nature continues to attract research attention as methods for dating and analyzing early deposits advance.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 3">[1]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapter 3 \u2014 Paleoindian period and pre-Clovis evidence", chunk: "The stratified deposits at Cactus Hill present the strongest case for pre-Clovis occupation in the eastern United States, with cultural materials sealed beneath an intact Clovis component\u2026" }
+    ],
+    evidence: [
+      ["Cactus Hill", "located in", "Nottoway River"],
+      ["Cactus Hill", "dated to", "Paleoindian (15000\u201310000 BC)"],
+      ["Cactus Hill", "documented in", "The Archaeology of Virginia's First Peoples"],
+      ["Cactus Hill", "dated to", "Woodland (1200 BC\u20131600 AD)"],
+    ],
+    stats: { nodes: 8, relationships: 12, sources: 1 }
+  },
+
+  // Thunderbird + Archaic Period
+  "Archaic (8000\u20131200 BC)|Thunderbird": {
+    strategy: "Filter Search \u2014 Site + Period",
+    answer: `<p>The Thunderbird site, located in the Shenandoah Valley near Front Royal, Virginia, is one of the most extensively excavated Paleoindian and Early Archaic sites in eastern North America. While best known for its Clovis-era jasper quarry and workshop complex, the site's Archaic period components provide critical evidence for understanding the transition from Paleoindian lifeways to the diversified adaptations of the Archaic.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 3\u20134">[1]</span></p>
+<p>William Gardner's multi-decade excavation project at Thunderbird and the adjacent Flint Run complex documented a remarkable stratigraphic sequence spanning thousands of years. The Early Archaic levels (8000\u20136000 BC) show a shift from the specialized jasper-focused lithic reduction of the Paleoindian period toward a broader toolkit incorporating notched and stemmed projectile points, ground stone implements, and a wider range of raw materials.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 4">[1]</span></p>
+<p>The Archaic occupation at Thunderbird reflects a community increasingly adapted to the warming Holocene environment of the Shenandoah Valley. Site structure suggests seasonal encampments focused on the rich lithic resources of the Flint Run jasper outcrop, but with evidence of broader subsistence activities\u2014plant processing, small game hunting\u2014absent from the earlier Paleoindian levels. The continuity of occupation from Clovis through Early Archaic at this single locality provides rare evidence for in-place cultural evolution rather than population replacement.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 4">[1]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapters 3\u20134 \u2014 Thunderbird-Flint Run complex, Paleoindian to Archaic transition", chunk: "The Thunderbird site and adjacent Flint Run localities represent the most complete Paleoindian-to-Archaic transitional sequence documented in the Middle Atlantic region\u2026" }
+    ],
+    evidence: [
+      ["Thunderbird", "located in", "Shenandoah Valley"],
+      ["Thunderbird", "dated to", "Archaic (8000\u20131200 BC)"],
+      ["Flint Run", "located in", "Shenandoah Valley"],
+      ["Projectile points", "dated to", "Archaic (8000\u20131200 BC)"],
+      ["Thunderbird", "documented in", "The Archaeology of Virginia's First Peoples"],
+    ],
+    stats: { nodes: 10, relationships: 16, sources: 1 }
+  },
+
+  // Thunderbird alone
+  "Thunderbird": {
+    strategy: "Filter Search \u2014 Site Focus",
+    answer: `<p>The Thunderbird site in Warren County, Virginia, situated within the Flint Run complex along the South Fork of the Shenandoah River, stands as one of the most important Paleoindian sites in eastern North America. Excavated primarily by William Gardner beginning in the 1970s, the site revealed a stratified sequence of occupation from the Clovis period through the Archaic, centered on a major jasper quarry and lithic workshop.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 3">[1]</span></p>
+<p>The Paleoindian component at Thunderbird produced abundant Clovis and post-Clovis fluted points crafted from locally available jasper, along with extensive debitage indicating on-site tool manufacture. The spatial organization of the site\u2014with distinct quarry, workshop, and habitation areas\u2014provided unprecedented insight into Paleoindian land use and social organization in the Shenandoah Valley.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 3">[1]</span></p>
+<p>Subsequent Archaic and Early Woodland occupations at the site demonstrate the enduring attractiveness of the Flint Run jasper source, which drew human populations to this locality for thousands of years. The multi-component nature of Thunderbird makes it a key reference site for the cultural chronology of the Middle Atlantic region.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 3\u20134">[1]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapters 3\u20134 \u2014 Thunderbird site and Flint Run complex", chunk: "Gardner's excavations at Thunderbird revealed a Paleoindian jasper quarry-workshop-habitation complex of a scale and clarity unmatched in the eastern United States\u2026" }
+    ],
+    evidence: [
+      ["Thunderbird", "located in", "Shenandoah Valley"],
+      ["Thunderbird", "located in", "Flint Run"],
+      ["Thunderbird", "dated to", "Paleoindian (15000\u201310000 BC)"],
+      ["Thunderbird", "dated to", "Archaic (8000\u20131200 BC)"],
+    ],
+    stats: { nodes: 7, relationships: 11, sources: 1 }
+  },
+
+  // Werowocomoco alone
+  "Werowocomoco": {
+    strategy: "Filter Search \u2014 Site Focus",
+    answer: `<p>Werowocomoco, located on the York River in Gloucester County, served as the political and ceremonial capital of the Powhatan paramount chiefdom at the time of English contact. The site was the seat of Wahunsenacah (Chief Powhatan) and the location where many of the earliest English-Powhatan interactions took place, including encounters documented by John Smith.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7\u20138">[1]</span></p>
+<p>Archaeological investigations beginning in 2003 revealed that the site's significance extends far beyond the Contact period. Excavations uncovered monumental earthworks\u2014a series of ditches and embankments\u2014dating to the Late Woodland period, centuries before English arrival. These features suggest that Werowocomoco was a place of political and ceremonial importance long before the rise of the Powhatan chiefdom as the English knew it.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>The site's material culture includes dense concentrations of shell-tempered pottery, copper ornaments, and other prestige goods consistent with a chiefly center. Its location on the York River provided access to both estuarine resources and the riverine trade networks that connected Tidewater communities.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapters 7\u20138 \u2014 Powhatan chiefdom and Werowocomoco excavations", chunk: "Werowocomoco emerged as a place of central importance within the Powhatan political landscape, its monumental earthworks attesting to deep roots predating English contact\u2026" }
+    ],
+    evidence: [
+      ["Werowocomoco", "affiliated with", "Powhatan"],
+      ["Wahunsenacah", "member of", "Powhatan"],
+      ["Werowocomoco", "located in", "York River"],
+      ["Shell-tempered pottery", "located in", "Werowocomoco"],
+      ["John Smith", "took place at", "Werowocomoco"],
+    ],
+    stats: { nodes: 9, relationships: 14, sources: 1 }
+  },
+
+  // ─── Persons ────────────────────────────────────────────────
+
+  // John Smith + Powhatan
+  "John Smith|Powhatan": {
+    strategy: "Filter Search \u2014 Person + People",
+    answer: `<p>Captain John Smith's accounts of the Powhatan chiefdom constitute some of the most detailed European documentation of an indigenous society in early North America. His writings from 1607\u20131609, though filtered through English cultural assumptions and political agenda, provide invaluable ethnographic observations that archaeology continues to test and refine.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>
+<p>Smith documented the political structure of the Powhatan paramount chiefdom with remarkable specificity, describing the tributary relationships between Wahunsenacah and some 30 constituent groups across the Tidewater. His accounts of Powhatan towns\u2014their longhouse architecture, palisade fortifications, temple structures, and agricultural fields\u2014have been substantially corroborated by archaeological excavation at sites including Werowocomoco, the paramount chief's capital on the York River.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7\u20138">[1]</span></p>
+<p>Smith's famous map of Virginia, published in 1612, located numerous Powhatan settlements and delineated territorial boundaries that align closely with the distribution of shell-tempered pottery and other Algonquian material culture markers in the archaeological record. The map remains a primary reference for identifying Contact-period indigenous sites throughout the Tidewater.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>
+<p>His descriptions of Powhatan subsistence\u2014the cultivation of maize, beans, and squash, the harvesting of oysters and fish, the seasonal hunting rounds\u2014provide a textual counterpart to the faunal and botanical evidence recovered from Tidewater archaeological sites, enabling researchers to build a more complete picture of late precontact and Contact-era lifeways.<span class="citation" title="History of the Valley of Virginia, pp. 55\u201360">[2]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapters 7\u20138 \u2014 Powhatan chiefdom and English contact", chunk: "Smith's ethnohistorical observations, when tested against the archaeological record, prove remarkably accurate in their depiction of Powhatan settlement patterns, political geography, and material culture\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 pp. 55\u201360, eastern Virginia context", chunk: "The accounts left by Captain Smith and other early adventurers paint a picture of a numerous and well-organized people occupying the eastern lowlands\u2026" }
+    ],
+    evidence: [
+      ["Powhatan", "documented in", "John Smith"],
+      ["Powhatan", "located in", "Tidewater"],
+      ["John Smith", "took place at", "Werowocomoco"],
+      ["Wahunsenacah", "member of", "Powhatan"],
+      ["Tidewater", "documented in", "John Smith"],
+    ],
+    stats: { nodes: 12, relationships: 20, sources: 2 }
+  },
+
+  // John Smith alone
+  "John Smith": {
+    strategy: "Filter Search \u2014 Person Focus",
+    answer: `<p>Captain John Smith (1580\u20131631) left an indelible mark on the documentation of Virginia's indigenous peoples. His writings, maps, and illustrations from the Jamestown colony period (1607\u20131609) provide the most extensive contemporary European account of Tidewater Virginia's native societies at the moment of contact.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>
+<p>Smith's 1612 Map of Virginia located over 160 indigenous settlements and identified the territorial boundaries of the Powhatan chiefdom and neighboring groups. Archaeological survey has confirmed the locations of many sites Smith mapped, lending credibility to his broader ethnographic observations. His descriptions of native architecture, agricultural practices, craft production, and political organization remain essential comparative data for interpreting the archaeological record.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>
+<p>While Smith's accounts must be read critically\u2014he was a promotional writer as much as an observer, and his narratives served English colonial interests\u2014the specificity of his material culture descriptions allows archaeologists to correlate his observations with artifact assemblages from excavated Contact-period sites across the Tidewater and Chesapeake regions.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapter 8 \u2014 Contact period ethnohistory", chunk: "Smith's detailed observations of Powhatan material culture provide a crucial bridge between the archaeological and documentary records of Contact-period Virginia\u2026" }
+    ],
+    evidence: [
+      ["Powhatan", "documented in", "John Smith"],
+      ["Tidewater", "documented in", "John Smith"],
+      ["John Smith", "took place at", "Jamestown"],
+      ["Shell-tempered pottery", "documented in", "John Smith"],
+    ],
+    stats: { nodes: 8, relationships: 13, sources: 1 }
+  },
+
+  // Samuel Kercheval alone
+  "Samuel Kercheval": {
+    strategy: "Filter Search \u2014 Person Focus",
+    answer: `<p>Samuel Kercheval (1767\u20131845) authored <em>A History of the Valley of Virginia</em>, first published in 1833, which remains one of the most important primary sources for understanding the early European settlement of the Shenandoah Valley and the traces of indigenous occupation that settlers encountered.<span class="citation" title="History of the Valley of Virginia">[1]</span></p>
+<p>Kercheval's work is significant to archaeology not for any systematic investigation\u2014he was a historian and local chronicler, not a scientist\u2014but for his detailed recording of surface artifacts, earthworks, and other evidence of prior native habitation that early settlers observed before plowing and development disturbed or destroyed these remains. His accounts of "arrowheads," pottery fragments, cleared fields, and trail systems provide baseline data for understanding the archaeological landscape as it existed in the early nineteenth century.<span class="citation" title="History of the Valley of Virginia, pp. 28\u201358">[1]</span></p>
+<p>His descriptions of the Great Warriors' Path and other native trails through the Valley, the distribution of surface artifacts along river terraces, and the general absence of permanent indigenous settlements by the 1720s\u20131730s all corroborate archaeological evidence for a region that was densely occupied during the Late Woodland period but largely depopulated by the effects of the Contact Era.<span class="citation" title="History of the Valley of Virginia, pp. 55\u201372">[1]</span></p>`,
+    sources: [
+      { num: 1, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 full volume, archaeological and ethnographic observations", chunk: "Kercheval's meticulous recording of the material traces left by the Valley's former inhabitants provides an irreplaceable snapshot of the archaeological landscape before modern disturbance\u2026" }
+    ],
+    evidence: [
+      ["History of the Valley of Virginia", "carried out by", "Samuel Kercheval"],
+      ["Shenandoah Valley", "documented in", "History of the Valley of Virginia"],
+      ["Siouan-speaking peoples", "documented in", "History of the Valley of Virginia"],
+      ["Contact Era (1600\u20131700)", "took place at", "Shenandoah Valley"],
+    ],
+    stats: { nodes: 7, relationships: 11, sources: 1 }
+  },
+
+  // Thomas Jefferson alone
+  "Thomas Jefferson": {
+    strategy: "Filter Search \u2014 Person Focus",
+    answer: `<p>Thomas Jefferson's 1784 excavation of a burial mound on his Rivanna River property near Charlottesville is widely regarded as the first scientific archaeological excavation in North America. His systematic approach\u2014cutting a trench through the mound to observe its stratigraphy\u2014anticipated methods that would not become standard practice for another century.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>Jefferson's account, published in <em>Notes on the State of Virginia</em> (1785), described a mound containing the remains of an estimated thousand individuals deposited over multiple episodes, with distinct layers of bone separated by soil and stone. His observation that the mound had been built up through successive interments rather than as a single event was remarkably prescient and aligns with modern understanding of Monacan accretional burial practices along the upper James River.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>The mound Jefferson excavated was almost certainly a Monacan burial mound, part of a tradition of mound construction that archaeological survey has documented at multiple sites along the James River and its tributaries. Jefferson's careful observations remain valuable data, as the mound itself has since been destroyed by agricultural activity.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapter 7 \u2014 Monacan burial mounds and early excavation history", chunk: "Jefferson's trench through the Rivanna mound revealed the accretional nature of Monacan mortuary practice, an observation confirmed by modern excavation of similar features along the James River\u2026" }
+    ],
+    evidence: [
+      ["Monacan burial mound", "carried out by", "Thomas Jefferson"],
+      ["Thomas Jefferson", "documented in", "Notes on the State of Virginia"],
+      ["Monacan", "located in", "James River"],
+      ["Ely Mound", "documented in", "The Archaeology of Virginia's First Peoples"],
+    ],
+    stats: { nodes: 8, relationships: 12, sources: 1 }
+  },
+
+  // John Lederer alone
+  "John Lederer": {
+    strategy: "Filter Search \u2014 Person Focus",
+    answer: `<p>John Lederer, a German physician and explorer, conducted three expeditions into Virginia's interior in 1669\u20131670, producing some of the earliest European accounts of the Piedmont and Blue Ridge landscapes and the indigenous peoples who inhabited them. His accounts, though sometimes questioned for their accuracy, provide rare ethnohistorical data for a period and region poorly documented by other colonial sources.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>
+<p>Lederer's observations of Siouan-speaking communities in the Piedmont\u2014their towns, agricultural practices, and trade networks\u2014offer a snapshot of these societies in the decades before sustained European contact transformed them. His descriptions of native settlements along the eastern slopes of the Blue Ridge are among the few written accounts of Monacan and Manahoac communities observed firsthand by a European before the demographic collapse of the late seventeenth century.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 8">[1]</span></p>
+<p>His reports of well-worn trails crossing the Blue Ridge and connecting Piedmont communities with Valley populations corroborate archaeological evidence for long-distance exchange networks that moved goods and ideas across the mountain barrier.<span class="citation" title="History of the Valley of Virginia, pp. 38\u201345">[2]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapter 8 \u2014 Early European exploration accounts", chunk: "Lederer's expeditions into the Virginia interior provide some of the earliest European observations of Siouan-speaking communities in the Piedmont\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 pp. 38\u201345, early exploration", chunk: "The accounts of early travellers describe paths and settlements that correspond to the archaeological evidence of native habitation\u2026" }
+    ],
+    evidence: [
+      ["John Lederer", "took place at", "Blue Ridge"],
+      ["Monacan", "documented in", "John Lederer"],
+      ["Blue Ridge", "documented in", "John Lederer"],
+      ["Monacan", "located in", "Piedmont region"],
+    ],
+    stats: { nodes: 7, relationships: 10, sources: 2 }
+  },
+
+  // ─── Cross-type combinations with new entities ──────────────
+
+  // Ely Mound + Monacan
+  "Ely Mound|Monacan": {
+    strategy: "Filter Search \u2014 Site + People",
+    answer: `<p>The Ely Mound, located in Lee County in far southwestern Virginia, represents an important example of indigenous mound-building tradition, though its cultural affiliation differs from the Monacan burial mounds of the Piedmont. While both the Ely Mound and Monacan mounds reflect the broader Eastern Woodlands practice of monumental earthwork construction, they belong to distinct cultural traditions.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>The Ely Mound is associated with late prehistoric populations in the Cumberland Gap region, likely connected to Mississippian-influenced cultures rather than the Siouan-speaking Monacan. However, comparing these two mound traditions illuminates the diversity of indigenous monumental architecture across Virginia. Monacan accretional burial mounds along the upper James River were built up through repeated interment over generations, while southwestern Virginia mounds like Ely show different construction techniques and purposes tied to distinct cultural networks.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapter 7 \u2014 Mound traditions across Virginia", chunk: "Virginia's mound-building traditions span multiple cultural groups and time periods, from the Monacan accretional mounds of the Piedmont to the Mississippian-influenced constructions of the far southwest\u2026" }
+    ],
+    evidence: [
+      ["Ely Mound", "located in", "Lee County"],
+      ["Monacan", "located in", "James River"],
+      ["Ely Mound", "documented in", "The Archaeology of Virginia's First Peoples"],
+      ["Monacan", "located in", "Piedmont region"],
+    ],
+    stats: { nodes: 8, relationships: 12, sources: 1 }
+  },
+
+  // Werowocomoco + Powhatan
+  "Powhatan|Werowocomoco": {
+    strategy: "Filter Search \u2014 People + Site",
+    answer: `<p>Werowocomoco served as the paramount capital of the Powhatan chiefdom, the political and ceremonial center from which Wahunsenacah governed a network of some 30 tributary groups across Virginia's Tidewater region. Archaeological investigation of the site, located on Purtan Bay along the York River in Gloucester County, has transformed understanding of Powhatan political organization and its deep historical roots.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7\u20138">[1]</span></p>
+<p>Excavations revealed that the site's importance predated the Contact-era chiefdom by centuries. Late Woodland monumental earthworks\u2014a series of parallel ditches and berms\u2014indicate that Werowocomoco was a place of ceremonial and political significance well before Wahunsenacah consolidated his paramount authority in the late sixteenth century. This deep history suggests the Powhatan chiefdom built upon preexisting traditions of centralized authority at this location.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>Material culture from the site includes dense concentrations of shell-tempered pottery, copper artifacts, and other prestige items consistent with a chiefly center. The site's strategic position on the York River placed it at the intersection of estuarine resources and the riverine trade networks that linked Tidewater communities, reinforcing its role as the political heart of the Powhatan world.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7\u20138">[1]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapters 7\u20138 \u2014 Werowocomoco and Powhatan political organization", chunk: "The discovery and excavation of Werowocomoco has reshaped understanding of Powhatan political geography, revealing a capital with monumental architecture and deep temporal roots\u2026" }
+    ],
+    evidence: [
+      ["Werowocomoco", "affiliated with", "Powhatan"],
+      ["Wahunsenacah", "member of", "Powhatan"],
+      ["Shell-tempered pottery", "located in", "Werowocomoco"],
+      ["Werowocomoco", "dated to", "Late Woodland (900\u20131600 AD)"],
+      ["Powhatan", "located in", "Tidewater"],
+    ],
+    stats: { nodes: 10, relationships: 16, sources: 1 }
+  },
+
+  // Trigg + Late Woodland
+  "Late Woodland (900\u20131600 AD)|Trigg": {
+    strategy: "Filter Search \u2014 Site + Period",
+    answer: `<p>The Trigg site, located along the New River in Radford, Virginia, is one of the most significant Late Woodland village sites in the western Virginia Piedmont. Excavations revealed a substantial palisaded settlement with evidence of intensive maize agriculture, diverse craft production, and complex mortuary practices dating to the fifteenth and sixteenth centuries.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>The site's ceramic assemblage is dominated by Radford series wares\u2014crushed-quartz-tempered pottery with cord-marked and fabric-impressed surfaces characteristic of Siouan-speaking peoples in the region. The presence of shell-tempered sherds alongside the dominant quartz-tempered wares suggests trade contact with Tidewater or other shell-tempering communities, documenting the kind of inter-regional exchange that connected Virginia's diverse Late Woodland populations.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>
+<p>Trigg's location on the New River places it within the territory traditionally attributed to Siouan-speaking groups, and its material culture aligns with the broader Monacan/Manahoac cultural sphere. The site provides critical evidence for understanding Late Woodland social organization, settlement patterns, and cultural boundaries in western Virginia.<span class="citation" title="The Archaeology of Virginia's First Peoples, Ch. 7">[1]</span></p>`,
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Chapter 7 \u2014 Late Woodland village sites in western Virginia", chunk: "The Trigg site represents one of the best-documented Late Woodland palisaded villages in the western Virginia interior, with material culture firmly within the Siouan cultural tradition\u2026" }
+    ],
+    evidence: [
+      ["Trigg", "dated to", "Late Woodland (900\u20131600 AD)"],
+      ["Trigg", "located in", "New River"],
+      ["Crushed-quartz temper ceramics", "located in", "Trigg"],
+      ["Trigg", "affiliated with", "Siouan-speaking peoples"],
+    ],
+    stats: { nodes: 8, relationships: 13, sources: 1 }
+  }
+};
+
+const QUERY_LABELS = [
+  "Shenandoah Valley \u2194 Virginia native cultures",
+  "Tidewater vs. Piedmont ceramics",
+  "Monacan settlements on the James River",
+  "Contact Era impact on indigenous peoples"
+];
+
+const QUERY_KEYS = Object.keys(QUERIES);
+
+// ─── State ────────────────────────────────────────────────────
+
+let activeEntities = new Set();
+let searchIsFromFilters = false;
+let filterSearchDebounce = null;
+
+// ─── Render Functions ─────────────────────────────────────────
+
+function renderSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  let html = `<div class="sidebar-hint">Click entities to search by topic</div>`;
+  for (const [category, data] of Object.entries(ENTITIES)) {
+    html += `<h3>${category}</h3><ul class="entity-list">`;
+    for (const item of data.items) {
+      const id = item.name.replace(/[^a-zA-Z0-9]/g, "_");
+      html += `
+        <li class="entity-item" data-entity="${item.name}" data-type="${data.type}" data-id="${id}">
+          <span class="entity-dot ${data.type}"></span>
+          ${item.name}
+          <span class="entity-count">${item.count}</span>
+        </li>`;
+    }
+    html += `</ul>`;
+  }
+  sidebar.innerHTML = html;
+
+  sidebar.querySelectorAll(".entity-item").forEach(el => {
+    el.addEventListener("click", () => toggleEntity(el));
+  });
+}
+
+function toggleEntity(el) {
+  const name = el.dataset.entity;
+  el.classList.toggle("active");
+  if (activeEntities.has(name)) {
+    activeEntities.delete(name);
+  } else {
+    activeEntities.add(name);
+  }
+  renderActiveFilters();
+  updateSearchPlaceholder();
+  triggerFilterSearch();
+}
+
+function setEntityActive(name, active) {
+  const el = document.querySelector(`.entity-item[data-entity="${CSS.escape(name)}"]`);
+  if (!el) return;
+  if (active) {
+    el.classList.add("active");
+    activeEntities.add(name);
+  } else {
+    el.classList.remove("active");
+    activeEntities.delete(name);
+  }
+}
+
+function clearAllFilters() {
+  activeEntities.clear();
+  document.querySelectorAll(".entity-item.active").forEach(el => el.classList.remove("active"));
+  renderActiveFilters();
+  updateSearchPlaceholder();
+}
+
+function renderActiveFilters() {
+  const bar = document.getElementById("active-filters-bar");
+  if (activeEntities.size === 0) {
+    bar.innerHTML = "";
+    bar.classList.remove("has-filters");
+    return;
+  }
+
+  bar.classList.add("has-filters");
+  let html = `<span class="active-filters-label">Searching by:</span>`;
+
+  for (const name of activeEntities) {
+    const type = ENTITY_TYPE_MAP[name] || "peoples";
+    html += `
+      <button class="filter-pill" data-entity="${name}">
+        <span class="pill-dot ${type}"></span>
+        ${name}
+        <span class="pill-x">\u00d7</span>
+      </button>`;
+  }
+
+  if (activeEntities.size > 1) {
+    html += `<button class="clear-filters-btn">Clear all</button>`;
+  }
+
+  bar.innerHTML = html;
+
+  bar.querySelectorAll(".filter-pill").forEach(pill => {
+    pill.addEventListener("click", () => {
+      const entity = pill.dataset.entity;
+      setEntityActive(entity, false);
+      renderActiveFilters();
+      updateSearchPlaceholder();
+      triggerFilterSearch();
+    });
+  });
+
+  const clearBtn = bar.querySelector(".clear-filters-btn");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      clearAllFilters();
+      // Show empty state
+      document.getElementById("results").innerHTML = `
+        <div class="results-empty">
+          <p>Select a sample query or click entities in the sidebar to explore the knowledge graph.</p>
+        </div>`;
+    });
+  }
+}
+
+function generateFilterSummary() {
+  if (activeEntities.size === 0) return "";
+
+  const names = [...activeEntities];
+  const peoples = names.filter(n => ENTITY_TYPE_MAP[n] === "peoples");
+  const persons = names.filter(n => ENTITY_TYPE_MAP[n] === "persons");
+  const sites = names.filter(n => ENTITY_TYPE_MAP[n] === "sites");
+  const places = names.filter(n => ENTITY_TYPE_MAP[n] === "places");
+  const periods = names.filter(n => ENTITY_TYPE_MAP[n] === "periods");
+  const artifacts = names.filter(n => ENTITY_TYPE_MAP[n] === "artifacts");
+
+  let parts = [];
+
+  if (peoples.length) {
+    parts.push(peoples.join(" and "));
+  }
+  if (persons.length) {
+    parts.push(persons.join(" and "));
+  }
+  if (artifacts.length) {
+    parts.push(artifacts.join(" and "));
+  }
+  if (sites.length) {
+    parts.push("at " + sites.join(" and "));
+  }
+  if (places.length) {
+    parts.push("in the " + places.join(" and "));
+  }
+  if (periods.length) {
+    parts.push("during the " + periods.join(" and "));
+  }
+
+  return parts.join(" ") || names.join(", ");
+}
+
+function updateSearchPlaceholder() {
+  const input = document.getElementById("search-input");
+  // Only update placeholder if user hasn't typed anything
+  if (!input.value.trim() || searchIsFromFilters) {
+    const summary = generateFilterSummary();
+    if (summary) {
+      input.placeholder = summary;
+      if (searchIsFromFilters) {
+        input.value = "";
+      }
+    } else {
+      input.placeholder = "Ask a question about Virginia archaeology...";
+    }
+  }
+}
+
+function triggerFilterSearch() {
+  if (activeEntities.size === 0) return;
+
+  searchIsFromFilters = true;
+  // Debounce to avoid rapid re-searches when toggling multiple filters quickly
+  clearTimeout(filterSearchDebounce);
+  filterSearchDebounce = setTimeout(() => {
+    executeFilterSearch();
+    searchIsFromFilters = false;
+  }, 150);
+}
+
+function findFilterResponse(selectedNames) {
+  // Sort names for consistent key matching
+  const sortedNames = [...selectedNames].sort();
+
+  // Try exact combination match (pipe-separated sorted)
+  const comboKey = sortedNames.join("|");
+  if (FILTER_RESPONSES[comboKey]) return FILTER_RESPONSES[comboKey];
+
+  // Try single entity match
+  if (sortedNames.length === 1 && FILTER_RESPONSES[sortedNames[0]]) {
+    return FILTER_RESPONSES[sortedNames[0]];
+  }
+
+  // Try subset matches (find the best match with most overlapping entities)
+  let bestMatch = null;
+  let bestOverlap = 0;
+
+  for (const key of Object.keys(FILTER_RESPONSES)) {
+    const keyEntities = key.split("|");
+    const overlap = keyEntities.filter(e => sortedNames.includes(e)).length;
+    if (overlap > bestOverlap && overlap === keyEntities.length) {
+      bestOverlap = overlap;
+      bestMatch = FILTER_RESPONSES[key];
+    }
+  }
+
+  if (bestMatch) return bestMatch;
+
+  // Generate a plausible generic response
+  return generateGenericResponse(selectedNames);
+}
+
+function generateGenericResponse(names) {
+  const peoples = names.filter(n => ENTITY_TYPE_MAP[n] === "peoples");
+  const persons = names.filter(n => ENTITY_TYPE_MAP[n] === "persons");
+  const sites = names.filter(n => ENTITY_TYPE_MAP[n] === "sites");
+  const places = names.filter(n => ENTITY_TYPE_MAP[n] === "places");
+  const periods = names.filter(n => ENTITY_TYPE_MAP[n] === "periods");
+  const artifacts = names.filter(n => ENTITY_TYPE_MAP[n] === "artifacts");
+
+  const summary = generateFilterSummary();
+
+  // Build a context-aware answer
+  let answerParts = [];
+
+  answerParts.push(`<p>Searching across the knowledge graph for connections involving ${summary} reveals several intersecting threads in the archaeological record of Virginia.<span class="citation" title="The Archaeology of Virginia's First Peoples">[1]</span></p>`);
+
+  if (peoples.length && places.length) {
+    answerParts.push(`<p>The relationship between ${peoples.join(" and ")} and ${places.join(" and ")} is documented through settlement patterns, material culture assemblages, and ethnohistorical accounts. Archaeological survey data shows diagnostic artifacts associated with ${peoples[0]} at multiple sites across ${places[0]}, indicating sustained occupation or seasonal use of this landscape.<span class="citation" title="The Archaeology of Virginia's First Peoples">[1]</span></p>`);
+  }
+
+  if (persons.length) {
+    answerParts.push(`<p>${persons.join(" and ")} contributed to the documentary and scholarly record of Virginia archaeology. Their observations, excavations, or written accounts provide essential context for interpreting the material evidence recovered from archaeological sites across the region.<span class="citation" title="The Archaeology of Virginia's First Peoples">[1]</span></p>`);
+  }
+
+  if (sites.length) {
+    answerParts.push(`<p>The archaeological site${sites.length > 1 ? "s" : ""} of ${sites.join(" and ")} provide${sites.length === 1 ? "s" : ""} stratified evidence of indigenous occupation, with material culture assemblages that illuminate settlement patterns, subsistence strategies, and cultural affiliations across multiple periods.<span class="citation" title="The Archaeology of Virginia's First Peoples">[1]</span></p>`);
+  }
+
+  if (periods.length) {
+    answerParts.push(`<p>The ${periods.join(" and ")} provides the temporal framework for understanding these connections. Cultural changes during this era\u2014visible in shifting ceramic styles, settlement patterns, and subsistence strategies\u2014reflect broader transformations across Virginia's indigenous landscape.<span class="citation" title="The Archaeology of Virginia's First Peoples">[1]</span></p>`);
+  }
+
+  if (artifacts.length) {
+    answerParts.push(`<p>${artifacts.join(" and ")} serve as key diagnostic indicators in the archaeological record. Their distribution across sites helps researchers trace trade networks, cultural boundaries, and technological change over time. Analysis of these artifacts from Virginia sites contributes to understanding both local traditions and broader regional interaction spheres.<span class="citation" title="History of the Valley of Virginia">[2]</span></p>`);
+  }
+
+  if (!peoples.length && !persons.length && !sites.length && !places.length && !periods.length && !artifacts.length) {
+    answerParts.push(`<p>The selected entities intersect across multiple subgraphs in the knowledge graph, suggesting connections documented in both primary archaeological sources and historical accounts of Virginia.<span class="citation" title="The Archaeology of Virginia's First Peoples">[1]</span></p>`);
+  }
+
+  answerParts.push(`<p>Further investigation through the full knowledge graph would synthesize graph traversals and entity-relationship analysis to provide a comprehensive picture of these interconnections.<span class="citation" title="History of the Valley of Virginia">[2]</span></p>`);
+
+  // Valid SHACL-derived relationship labels mapped by entity type pairs
+  // [subjectType, relationship, objectType]
+  const VALID_RELATIONSHIPS = {
+    "peoples-places":   "located in",       // Group -> Place
+    "sites-places":     "located in",       // Site -> Place
+    "artifacts-places": "located in",       // Artifact -> Place
+    "peoples-peoples":  "member of",        // Group -> Group
+    "persons-peoples":  "member of",        // Person -> Group
+    "sites-peoples":    "affiliated with",  // Site -> Group
+    "artifacts-peoples":"affiliated with",  // Artifact -> Group
+    "sites-periods":    "dated to",         // Site -> TimePeriod
+    "artifacts-periods":"dated to",         // Artifact -> TimePeriod
+    "peoples-periods":  "dated to",         // Group -> TimePeriod (via Event)
+    "periods-places":   "took place at",    // Event -> Place
+    "periods-peoples":  "involved",         // Event -> Group
+    "persons-sites":    "took place at",    // DiscoveryEvent -> Site
+    "persons-places":   "took place at",    // DiscoveryEvent -> Place
+    "places-places":    "within",           // Place -> Place
+    "sites-docs":       "documented in",    // anything -> Document
+    "peoples-docs":     "documented in",    // anything -> Document
+    "artifacts-docs":   "documented in",    // anything -> Document
+  };
+
+  // Build evidence triples from selected entities using valid relationships
+  const evidence = [];
+  if (peoples.length && places.length) {
+    evidence.push([peoples[0], "located in", places[0]]);
+  }
+  if (peoples.length && artifacts.length) {
+    evidence.push([artifacts[0], "affiliated with", peoples[0]]);
+  }
+  if (persons.length && peoples.length) {
+    evidence.push([peoples[0], "documented in", persons[0]]);
+  }
+  if (persons.length && sites.length) {
+    evidence.push([persons[0], "took place at", sites[0]]);
+  }
+  if (sites.length && periods.length) {
+    evidence.push([sites[0], "dated to", periods[0]]);
+  }
+  if (sites.length && peoples.length) {
+    evidence.push([sites[0], "affiliated with", peoples[0]]);
+  }
+  if (sites.length && places.length) {
+    evidence.push([sites[0], "located in", places[0]]);
+  }
+  if (places.length && artifacts.length) {
+    evidence.push([artifacts[0], "located in", places[0]]);
+  }
+  if (periods.length && peoples.length) {
+    evidence.push([periods[0], "involved", peoples[0]]);
+  }
+  if (periods.length && places.length) {
+    evidence.push([periods[0], "took place at", places[0]]);
+  }
+  // Add at least one triple if we have multiple entities of same type
+  if (evidence.length === 0 && names.length >= 2) {
+    const t = ENTITY_TYPE_MAP[names[0]];
+    if (t === "places") {
+      evidence.push([names[0], "within", names[1]]);
+    } else if (t === "peoples") {
+      evidence.push([names[0], "member of", names[1]]);
+    } else {
+      evidence.push([names[0], "documented in", names[1]]);
+    }
+  }
+
+  return {
+    strategy: "Filter Search \u2014 Entity Intersection",
+    answer: answerParts.join("\n"),
+    sources: [
+      { num: 1, title: "The Archaeology of Virginia's First Peoples", detail: "Multiple chapters \u2014 cross-referenced entity analysis", chunk: "Graph traversal identified connections spanning multiple relationship types\u2026" },
+      { num: 2, title: "History of the Valley of Virginia", detail: "Samuel Kercheval \u2014 contextual historical accounts", chunk: "The historical record provides corroborating accounts for patterns identified in the archaeological evidence\u2026" }
+    ],
+    evidence: evidence,
+    stats: {
+      nodes: 5 + names.length * 3,
+      relationships: 4 + names.length * 4,
+      sources: 2
+    }
+  };
+}
+
+function executeFilterSearch() {
+  const names = [...activeEntities];
+  if (names.length === 0) return;
+
+  const data = findFilterResponse(names);
+  renderResultData(data);
+}
+
+function renderSampleQueries() {
+  const container = document.getElementById("sample-queries");
+  QUERY_KEYS.forEach((q, i) => {
+    const chip = document.createElement("button");
+    chip.className = "sample-chip";
+    chip.textContent = QUERY_LABELS[i];
+    chip.addEventListener("click", () => {
+      document.getElementById("search-input").value = q;
+      searchIsFromFilters = false;
+      executeQuery(q);
+    });
+    container.appendChild(chip);
+  });
+}
+
+function renderResultData(data) {
+  const results = document.getElementById("results");
+
+  // Show typing indicator
+  results.innerHTML = `
+    <div class="typing-indicator">
+      <div class="typing-dots"><span></span><span></span><span></span></div>
+      Traversing knowledge graph\u2026
+    </div>`;
+
+  setTimeout(() => {
+    let evidenceHtml = "";
+    for (const triple of data.evidence) {
+      evidenceHtml += `
+        <div class="ev-group">
+          <span class="ev-node entity">${triple[0]}</span>
+          <span class="ev-arrow">\u2192</span>
+          <span class="ev-node relation">${triple[1]}</span>
+          <span class="ev-arrow">\u2192</span>
+          <span class="ev-node entity">${triple[2]}</span>
+        </div>`;
+    }
+
+    let sourcesHtml = "";
+    for (const src of data.sources) {
+      sourcesHtml += `
+        <div class="source-card">
+          <div class="source-num">${src.num}</div>
+          <div class="source-info">
+            <div class="source-title">${src.title}</div>
+            <div class="source-detail">${src.detail}</div>
+            <div class="source-chunk">${src.chunk}</div>
+          </div>
+        </div>`;
+    }
+
+    results.innerHTML = `
+      <div class="answer-card">
+        <div class="answer-meta">
+          <span class="strategy">${data.strategy}</span>
+          <span>${data.stats.nodes} nodes traversed</span>
+          <span>\u00b7</span>
+          <span>${data.stats.relationships} relationships</span>
+        </div>
+
+        <div class="answer-body">
+          ${data.answer}
+        </div>
+
+        <div class="sources-section">
+          <div class="section-label">Sources</div>
+          ${sourcesHtml}
+        </div>
+
+        <div class="evidence-section">
+          <div class="section-label">Knowledge Graph Connections Used</div>
+          <div class="evidence-chain">
+            ${evidenceHtml}
+          </div>
+        </div>
+
+        <div class="graph-stats">
+          <div class="stat-item">
+            <div class="stat-value">${data.stats.nodes}</div>
+            <div class="stat-label">Nodes</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">${data.stats.relationships}</div>
+            <div class="stat-label">Relationships</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">${data.stats.sources}</div>
+            <div class="stat-label">Sources</div>
+          </div>
+        </div>
+      </div>`;
+  }, 600);
+}
+
+function renderResults(queryKey) {
+  const data = QUERIES[queryKey];
+  if (!data) return;
+
+  renderResultData(data);
+
+  // Highlight sidebar entities mentioned in evidence
+  setTimeout(() => {
+    highlightEvidenceEntities(data.evidence);
+    renderActiveFilters();
+    updateSearchPlaceholder();
+  }, 650);
+}
+
+function highlightEvidenceEntities(evidence) {
+  const mentioned = new Set();
+  for (const triple of evidence) {
+    mentioned.add(triple[0]);
+    mentioned.add(triple[2]);
+  }
+
+  document.querySelectorAll(".entity-item").forEach(el => {
+    if (mentioned.has(el.dataset.entity)) {
+      el.classList.add("active");
+      activeEntities.add(el.dataset.entity);
+    } else {
+      el.classList.remove("active");
+      activeEntities.delete(el.dataset.entity);
+    }
+  });
+}
+
+function executeQuery(text) {
+  // Find exact match or closest match
+  const key = QUERY_KEYS.find(k =>
+    k.toLowerCase() === text.toLowerCase()
+  ) || QUERY_KEYS.find(k =>
+    text.toLowerCase().includes(k.substring(0, 30).toLowerCase())
+  ) || QUERY_KEYS[0];
+
+  renderResults(key);
+}
+
+// ─── Event Listeners ──────────────────────────────────────────
+
+document.getElementById("search-btn").addEventListener("click", () => {
+  const val = document.getElementById("search-input").value.trim();
+  if (val) {
+    searchIsFromFilters = false;
+    executeQuery(val);
+  } else if (activeEntities.size > 0) {
+    executeFilterSearch();
+  }
+});
+
+document.getElementById("search-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    const val = e.target.value.trim();
+    if (val) {
+      searchIsFromFilters = false;
+      executeQuery(val);
+    } else if (activeEntities.size > 0) {
+      executeFilterSearch();
+    }
+  }
+});
+
+// When user starts typing, clear filter-driven placeholder behavior
+document.getElementById("search-input").addEventListener("input", (e) => {
+  if (e.target.value.trim()) {
+    searchIsFromFilters = false;
+  }
+});
+
+// ─── Init ─────────────────────────────────────────────────────
+
+renderSidebar();
+renderSampleQueries();
+
+// Auto-load first query
+const defaultQuery = QUERY_KEYS[0];
+document.getElementById("search-input").value = defaultQuery;
+executeQuery(defaultQuery);
+</script>
+
+</body>
+</html>

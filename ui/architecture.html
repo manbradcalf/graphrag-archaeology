@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArchaeoGraph Virginia — System Architecture</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #111214;
+  --bg-raised: #1a1c1f;
+  --border:    #2c2f36;
+  --text:      #d4d4d8;
+  --text-dim:  #8b8d94;
+  --accent:    #c49a6c;
+  --accent-dim:#8a6d4b;
+  --accent-bg: rgba(196,154,108,0.08);
+  --font:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --mono:      'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+}
+
+header {
+  width: 100%;
+  padding: 28px 36px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.header-top {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.logo span { color: var(--text-dim); font-weight: 400; }
+
+.badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-dim);
+  background: var(--accent-bg);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.subtitle {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-top: 6px;
+}
+
+nav {
+  width: 100%;
+  padding: 10px 36px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-raised);
+}
+
+nav a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.8rem;
+  margin-right: 18px;
+}
+
+nav a:hover { color: var(--accent); }
+
+.diagram-container {
+  width: 100%;
+  max-width: 1400px;
+  padding: 36px;
+  overflow-x: auto;
+}
+
+.legend {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 16px 24px;
+  margin-bottom: 24px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo">ArchaeoGraph <span>Virginia</span></div>
+    <div class="badge">System Architecture</div>
+  </div>
+  <div class="subtitle">Knowledge graph explorer for Virginia archaeology — entity-first search with CIDOC-CRM ontology and optional LLM synthesis</div>
+</header>
+
+<nav>
+  <a href="index.html">Query UI</a>
+  <a href="architecture.html" style="color: var(--accent);">Architecture</a>
+</nav>
+
+<div class="diagram-container">
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch" style="background: #8a6d4b;"></div> Source data</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: #4a6fa5;"></div> Processing steps</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: #6b8e6b;"></div> Data stores</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: #9b6b9b;"></div> External services</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: #b07848;"></div> Outputs / UI</div>
+  </div>
+
+  <pre class="mermaid">
+%%{init: {
+  'theme': 'dark',
+  'themeVariables': {
+    'primaryColor': '#2a2520',
+    'primaryBorderColor': '#8a6d4b',
+    'primaryTextColor': '#d4d4d8',
+    'secondaryColor': '#1a2535',
+    'tertiaryColor': '#1e2e1e',
+    'lineColor': '#5a5a5a',
+    'textColor': '#d4d4d8',
+    'mainBkg': '#1a1c1f',
+    'nodeBorder': '#3a3a3a',
+    'clusterBkg': '#161618',
+    'clusterBorder': '#2c2f36',
+    'titleColor': '#c49a6c',
+    'edgeLabelBackground': '#111214'
+  }
+}}%%
+
+flowchart TB
+
+  %% ============================================================
+  %% SOURCE DOCUMENTS
+  %% ============================================================
+  subgraph SOURCES["Source Documents"]
+    direction LR
+    PDF1["History of Valley\nof Virginia\n(Kercheval, 1833)"]:::source
+    PDF2["Archaeology of\nVirginia First\nPeoples"]:::source
+  end
+
+  %% ============================================================
+  %% INGESTION PIPELINE
+  %% ============================================================
+  subgraph INGEST["Ingestion Pipeline"]
+    direction TB
+
+    subgraph EXTRACT["Text Extraction"]
+      EXT["PDF Extraction\nkreuzberg / pdfplumber"]:::process
+    end
+
+    subgraph CLEANUP["Text Cleanup"]
+      OCR["OCR Cleanup\nregex pipeline"]:::process
+      LLM_CLEAN["LLM Cleanup\nfix residual OCR artifacts"]:::process
+      OCR --> LLM_CLEAN
+    end
+
+    subgraph OUTPUT["Intermediate Output"]
+      MD["Clean Markdown\nper-document .md files"]:::store
+    end
+
+    subgraph KG_BUILD["Knowledge Graph Construction"]
+      direction TB
+      NER["Claude NER\nSHACL-guided"]:::process
+      REL_EXT["Relationship Extraction\nClaude, SHACL-guided"]:::process
+      RESOLVE["Entity Resolution\ndeduplicate & merge"]:::process
+      NER --> REL_EXT
+      REL_EXT --> RESOLVE
+    end
+
+    subgraph NER_DETAIL["Extracted Entity Types"]
+      direction LR
+      E1["Groups"]:::entity
+      E2["Persons"]:::entity
+      E3["Sites"]:::entity
+      E4["Places"]:::entity
+      E5["TimePeriods"]:::entity
+      E6["Artifacts"]:::entity
+      E7["Events"]:::entity
+      E8["DiscoveryEvents"]:::entity
+      E9["Documents"]:::entity
+    end
+
+    subgraph CHUNK["Text Chunking"]
+      CHUNKER["Markdown Chunking\nheading/paragraph boundaries"]:::process
+    end
+
+    subgraph LINKING["Chunk-Entity Linking"]
+      LINK["Link Chunks to Entities\nvia :MENTIONS edges"]:::process
+    end
+
+    EXT --> OCR
+    LLM_CLEAN --> MD
+    MD --> NER
+    MD --> CHUNKER
+    NER -.-> NER_DETAIL
+    RESOLVE --> LINK
+    CHUNKER --> LINK
+  end
+
+  %% ============================================================
+  %% SHARED STORAGE
+  %% ============================================================
+  subgraph STORAGE["Storage Layer — Neo4j"]
+    direction LR
+    NEO["Entity Nodes\nGroups, Persons, Sites,\nPlaces, TimePeriods,\nArtifacts, Events"]:::datastore
+    CHUNKS_STORE[":Chunk Nodes\ntext, page, section\nvector embedding\n+ vector index"]:::datastore
+    NEO -- ":MENTIONS" --- CHUNKS_STORE
+    DOC_STORE[":Document Nodes\nsource PDFs"]:::datastore
+    CHUNKS_STORE -- ":FROM_DOCUMENT" --- DOC_STORE
+  end
+
+  %% ============================================================
+  %% POST-LOAD STEPS
+  %% ============================================================
+  subgraph POSTLOAD["Post-Load Processing"]
+    direction LR
+    EMBED["Generate Embeddings\nper chunk"]:::process
+    VALIDATE["SHACL Validation\npost-load shape check"]:::process
+  end
+
+  %% ============================================================
+  %% SHARED RESOURCES
+  %% ============================================================
+  subgraph SHARED["Shared Resources"]
+    direction LR
+    SHACL["SHACL Schema\nvirginia-archaeology.shacl.ttl\nshapes & constraints"]:::schema
+    CLAUDE["Claude API\nAnthropic LLM"]:::external
+  end
+
+  %% ============================================================
+  %% QUERY FLOW
+  %% ============================================================
+  subgraph QUERY["Query Flow"]
+    direction TB
+
+    UI["Browser UI\nquery input, entity filters,\nnaive/graph toggle"]:::ui
+
+    subgraph FILTER_PATH["Filter Path (entity selection)"]
+      direction TB
+      PARSE_FILTERS["Parse Filters\nentity node IDs"]:::process
+      SUBGRAPH_RET["Subgraph Retrieval\n1-2 hop neighborhood"]:::process
+      PATH_CHECK["Path Check\nbetween entities, max 3 hops"]:::process
+      GET_CHUNKS["Get Chunks via :MENTIONS\nretrieve linked text"]:::process
+      PARSE_FILTERS --> SUBGRAPH_RET
+      SUBGRAPH_RET --> PATH_CHECK
+      PATH_CHECK --> GET_CHUNKS
+    end
+
+    subgraph TEXT_PATH["Text Path (query input)"]
+      direction TB
+      EMBED_Q["Embed Query\nvector encode"]:::process
+      NAIVE_OR_GRAPH{"Naive / Graph\ntoggle"}:::ui
+      VEC_NAIVE["Vector Search\nfull index, no graph"]:::process
+      VEC_GRAPH["Vector Search\nfull index"]:::process
+      RANKED["Ranked Chunks\nby similarity"]:::process
+      EMBED_Q --> NAIVE_OR_GRAPH
+      NAIVE_OR_GRAPH -- "naive RAG" --> VEC_NAIVE
+      NAIVE_OR_GRAPH -- "graph RAG" --> VEC_GRAPH
+      VEC_NAIVE --> RANKED
+      VEC_GRAPH --> RANKED
+    end
+
+    PROMPT["Prompt Assembly\nquery + triples +\nchunks + connection status"]:::process
+
+    subgraph RESPONSE["Response"]
+      ANSWER["Answer Text\nwith source citations"]:::ui
+      GRAPH_VIZ["Graph Connections\ntraversal stats"]:::ui
+    end
+
+    UI -- "entity filters selected" --> PARSE_FILTERS
+    UI -- "text query entered" --> EMBED_Q
+    GET_CHUNKS --> PROMPT
+    RANKED --> PROMPT
+    PROMPT --> SYNTH["LLM Synthesis\nClaude API"]:::external
+    SYNTH --> ANSWER
+    SYNTH --> GRAPH_VIZ
+  end
+
+  %% ============================================================
+  %% CONNECTIONS BETWEEN SECTIONS
+  %% ============================================================
+  SOURCES --> EXT
+
+  LINK --> NEO
+  LINK --> CHUNKS_STORE
+  CHUNKS_STORE --> EMBED
+  NEO --> VALIDATE
+  EMBED --> CHUNKS_STORE
+
+  SHACL -. "guides extraction" .-> NER
+  SHACL -. "guides relationships" .-> REL_EXT
+  SHACL -. "validates shapes" .-> VALIDATE
+  CLAUDE -. "cleanup" .-> LLM_CLEAN
+  CLAUDE -. "NER" .-> NER
+  CLAUDE -. "relationships" .-> REL_EXT
+  CLAUDE -. "synthesis" .-> SYNTH
+
+  NEO --> SUBGRAPH_RET
+  NEO --> PATH_CHECK
+  CHUNKS_STORE --> VEC_NAIVE
+  CHUNKS_STORE --> VEC_GRAPH
+
+  %% ============================================================
+  %% STYLES
+  %% ============================================================
+  classDef source fill:#2a2520,stroke:#8a6d4b,stroke-width:2px,color:#d4d4d8
+  classDef process fill:#1a2535,stroke:#4a6fa5,stroke-width:1.5px,color:#d4d4d8
+  classDef store fill:#1e2e1e,stroke:#5a8a5a,stroke-width:1.5px,color:#d4d4d8
+  classDef datastore fill:#1e2e1e,stroke:#6b8e6b,stroke-width:2px,color:#d4d4d8
+  classDef external fill:#2a1e2a,stroke:#9b6b9b,stroke-width:2px,color:#d4d4d8
+  classDef schema fill:#2a2520,stroke:#8a6d4b,stroke-width:1.5px,color:#d4d4d8
+  classDef ui fill:#2a2015,stroke:#b07848,stroke-width:2px,color:#d4d4d8
+  classDef entity fill:#1a2030,stroke:#4a6090,stroke-width:1px,color:#8b8d94,font-size:11px
+
+  style SOURCES fill:#161618,stroke:#8a6d4b,stroke-width:1px,color:#c49a6c
+  style INGEST fill:#0e0f10,stroke:#2c2f36,stroke-width:1px,color:#c49a6c
+  style EXTRACT fill:#161618,stroke:#2c2f36,stroke-width:1px,color:#4a6fa5
+  style CLEANUP fill:#161618,stroke:#2c2f36,stroke-width:1px,color:#4a6fa5
+  style OUTPUT fill:#161618,stroke:#2c2f36,stroke-width:1px,color:#5a8a5a
+  style KG_BUILD fill:#161618,stroke:#2c2f36,stroke-width:1px,color:#4a6fa5
+  style NER_DETAIL fill:#161618,stroke:#2c2f36,stroke-dasharray:5 5,stroke-width:1px,color:#8b8d94
+  style CHUNK fill:#161618,stroke:#2c2f36,stroke-width:1px,color:#4a6fa5
+  style LINKING fill:#161618,stroke:#2c2f36,stroke-width:1px,color:#4a6fa5
+  style STORAGE fill:#161618,stroke:#6b8e6b,stroke-width:1px,color:#6b8e6b
+  style POSTLOAD fill:#161618,stroke:#6b8e6b,stroke-dasharray:5 5,stroke-width:1px,color:#6b8e6b
+  style SHARED fill:#161618,stroke:#9b6b9b,stroke-dasharray:5 5,stroke-width:1px,color:#9b6b9b
+  style QUERY fill:#0e0f10,stroke:#2c2f36,stroke-width:1px,color:#c49a6c
+  style FILTER_PATH fill:#161618,stroke:#2c2f36,stroke-width:1px,color:#4a6fa5
+  style TEXT_PATH fill:#161618,stroke:#2c2f36,stroke-width:1px,color:#4a6fa5
+  style RESPONSE fill:#161618,stroke:#2c2f36,stroke-width:1px,color:#b07848
+  </pre>
+</div>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    flowchart: {
+      useMaxWidth: true,
+      htmlLabels: true,
+      curve: 'basis',
+      rankSpacing: 60,
+      nodeSpacing: 40
+    },
+    securityLevel: 'loose'
+  });
+</script>
+
+</body>
+</html>
