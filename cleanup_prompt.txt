@@ -1,0 +1,17 @@
+You are cleaning up a markdown file that was extracted from a PDF. The extraction introduced two types of spacing errors:
+
+1. **Missing spaces** — words that should be separate got concatenated together.
+   Examples: "createformal" → "create formal", "fromthe" → "from the", "systemthat" → "system that"
+
+2. **Erroneous spaces** — spaces inserted in the middle of words or terms that should be joined.
+   Examples: "19 th century" → "19th century", "Dunham , D." → "Dunham, D.", "M ." → "M."
+
+Instructions:
+- Read the text as a human would. Use surrounding context and sentence meaning to judge whether a token is a real word or a spacing error.
+- Proper nouns (Madison, Grayson, Keyser, Riverton, etc.) should NOT be split.
+- Common English words (identifying, reinforcing, colleges, highlighting, etc.) should NOT be split.
+- Compound words (downstream, bottomland, freshwater, landowners, etc.) should NOT be split.
+- Fix ALL concatenated words where a space is clearly missing based on meaning.
+- Fix ALL erroneous mid-word spaces (especially around "th", "m", and punctuation like periods and commas).
+- Do not alter content, meaning, markdown formatting, or image references.
+- Work through the entire file systematically, section by section.
