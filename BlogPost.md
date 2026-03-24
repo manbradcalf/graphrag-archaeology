@@ -197,3 +197,188 @@ We ran out of API credits ($0 wallet, $100 limit — the limit is how much you *
 5. Then: re-run NER, relationship extraction, entity resolution, Neo4j loading, embeddings
 
 The pipeline is built. The modules are all there. We just need money in the wallet and data in the graph.
+
+## Attempt #2: Let Neo4j Do It
+
+After hand-building every stage of the extraction pipeline — chunker, NER, relationship extraction, entity resolution, Neo4j loader — we had a moment of clarity: Neo4j's `neo4j-graphrag` package has a `SimpleKGPipeline` that does all of this in one function call. Feed it a PDF, an LLM, and a schema, and it handles the rest. If it works, that's hundreds of lines of custom code we don't need.
+
+So we wired it up: Anthropic's Sonnet for extraction, Nomic embeddings running locally, and our same CIDOC-CRM ontology. The schema translated cleanly — 9 node types, 12 relationship types, 32 triple patterns, all passed as a dict.
+
+Getting it to actually *start* was the hard part. Wrong package name (the Neo4j ecosystem has at least three packages with "graphrag" in the name). Embedding model that silently hangs without an obscure `trust_remote_code` flag. A missing tensor library that isn't in anyone's dependency tree. A database name that doesn't exist in Community Edition. Each fix took five minutes; finding each problem took thirty.
+
+But then it ran. Entities and relationships started appearing in Neo4j in real time. Sites, groups, people, artifacts — all getting extracted from the First Peoples PDF and wired together with CIDOC-CRM relationships. It was genuinely exciting to watch.
+
+Then it hit entity resolution — the step where "Powhatan" and "Powhatan Confederacy" and "the Powhatan" get merged into one node — and Anthropic went down. 529 errors across the board, confirmed outage on their status page.
+
+The pipeline didn't crash (we'd set `on_error="IGNORE"`), but that's almost worse. Entity resolution just silently didn't happen. So now we have a graph full of duplicates — "Shenandoah Valley" and "the Shenandoah" and "Valley of Virginia" all sitting there as separate nodes, waiting to be merged whenever the API comes back.
+
+### Two pipelines, neither finished
+
+We now have two extraction approaches, and neither has produced a complete graph:
+
+| | **Custom pipeline** | **SimpleKGPipeline** |
+|---|---|---|
+| **Code** | ~1,500 lines across 6 modules | ~300 lines, one file |
+| **Schema control** | Full | Good — same schema, passed as a dict |
+| **Extraction quality** | Unknown (ran out of API credits) | Unknown (entity resolution didn't finish) |
+| **Entity resolution** | Custom fuzzy matching | Built-in LLM-based (when the API is up) |
+| **Error handling** | Per-section saves, retry logic | Silent failures |
+| **PDF handling** | kreuzberg → markdown → chunking | Built-in PDF reader |
+
+SimpleKGPipeline got us further in one day than our custom pipeline did in its first week. But the silent failure mode is a real problem — when something goes wrong, you just don't know what you're missing.
+
+### Attempt #2b: Swap in OpenAI
+
+With Anthropic still flaky, we swapped `AnthropicLLM` for `OpenAILLM` — a one-line change in `neo4j-graphrag`, same interface — and pointed it at `gpt-4o`. Hit rate limits almost immediately. The pipeline fires 5 concurrent chunk extractions by default (`max_concurrency=5` inside `LLMEntityRelationExtractor`), and OpenAI's per-minute token limits didn't appreciate that.
+
+But the bigger issue was extraction quality. SimpleKGPipeline's built-in PDF reader strips all whitespace from OCR'd pages. Here's what the LLM was actually working with:
+
+> `Baconisverylittleknowntoourcitizensingeneral;andthispartofourhistoryhasbeenveiledingreatobscurity.TherearetworemembrancesofthisextraordinarymanintheneighboodofRich-mond.`
+
+No spaces. No paragraph breaks. Just a wall of concatenated words from a 200-year-old book. Our custom pipeline runs kreuzberg → regex cleanup → optional LLM cleanup before the LLM ever sees the text. SimpleKGPipeline skips all of that and feeds raw PDF extraction straight to the model.
+
+The remarkable thing is that `gpt-4o` still managed to pull real entities out of this mess:
+
+- **Bacon** (Person) — located in Richmond, Bacon Quarter Branch, Shockoe Creek
+- **Bloody Run Spring** (Place) — site of a conflict with Indians
+- **Conflict with Indians** (Event) — participant: Bacon, location: Bloody Run Spring
+
+The schema guided the extraction well — CIDOC-CRM types and relationships came through correctly. But compared to our custom pipeline feeding clean markdown to Sonnet, the coverage was noticeably thinner. The model spent its capacity parsing the text instead of understanding it.
+
+### Attempt #2c: Go fully local with Ollama
+
+Anthropic's API was still unstable (multiple outages through March 2026, and our org's rate limits were brutal — 8k output tokens/min for Sonnet, 10k for Haiku). OpenAI hit rate limits too. We decided to cut the dependency entirely and run local.
+
+`neo4j-graphrag` has a native `OllamaLLM` class, so the swap was clean — same interface, just a different import. We started with `gemma3:12b` on a Mac Mini M4 with 16GB unified memory.
+
+Two problems surfaced immediately.
+
+**The library has a bug.** `OllamaLLM`'s async methods pass all `model_params` as `options=` to Ollama's API, but Ollama expects `format` as a top-level parameter. So `format: "json"` — which tells Ollama to constrain output to valid JSON via token-level enforcement — was getting silently ignored. The sync methods use `**self.model_params` (correct), but `SimpleKGPipeline` uses the async path. We patched the `.venv` locally. This is a [known class of issue](https://github.com/neo4j/neo4j-graphrag-python/issues/376) that the maintainers thought they'd fixed in 1.9.1, but the fix only landed in the sync path.
+
+**12B is too big for 16GB.** `gemma3:12b` loaded 9.9GB into VRAM, leaving barely enough for the OS and Neo4j. Chunk extractions took 10-11 minutes each. With ~100 chunks from a single 4.7MB PDF, we were looking at 3+ hours. We switched to `qwen3:8b` (5.2GB) — still running, but noticeably faster.
+
+Even without the JSON format constraint working initially, `gemma3:12b` managed to extract entities from most chunks. Some failed with "LLM response has improper format" — valid JSON but wrong schema shape. With `on_error="IGNORE"`, those chunks just got skipped. The `format: "json"` fix should reduce these failures once we re-run.
+
+One bright spot: entity resolution in `SimpleKGPipeline` turned out to be a pure Cypher query (`apoc.refactor.mergeNodes`), not LLM-based. It matches entities with the same label and name, then merges them — takes seconds, no API calls. So at least that step won't hit rate limits or take forever.
+
+### What we learned about SimpleKGPipeline
+
+A code review surfaced several issues beyond the rate limits:
+
+- **`neo4j_database` is hardcoded** to `"neo4j"` in the pipeline constructor, ignoring the config value
+- **`CHUNK_SIZE` config is dead code** — `SimpleKGPipeline` always uses the library default (4000 chars), not our configured 1500
+- **`on_error="IGNORE"` only covers chunk extraction** — entity resolution errors propagate unhandled
+- **`max_concurrency=5`** is baked into `LLMEntityRelationExtractor` with no way to change it through `SimpleKGPipeline`
+- **No extraction logging** — the extractor has zero log statements, so you can't see what's being sent to the LLM or what comes back without patching the library
+- **Anthropic structured output not supported** — despite Anthropic now offering native constrained decoding via `output_config.format`, the neo4j-graphrag `AnthropicLLM` raises `NotImplementedError` for structured output
+
+`SimpleKGPipeline` is a great demo tool. For production use with rate-limited APIs or local models, you need the lower-level `Pipeline` API — or a lot of monkey-patching.
+
+### Attempt #2d: Throttle Anthropic and Actually Finish
+
+The rate limit problem was never going to be solved by retries alone. The built-in `RetryRateLimitHandler` (added in neo4j-graphrag 1.14.0, [issue #295](https://github.com/neo4j/neo4j-graphrag-python/issues/295)) backs off *after* a 429 — but with Haiku's free tier limits (10K input tokens/min, 50 requests/min), you blow past the ceiling before a single retry fires. The pipeline launches all chunk extractions concurrently. You need throttling, not just retry.
+
+We subclassed `AnthropicLLM` with a semaphore and minimum interval:
+
+```python
+class ThrottledAnthropicLLM(AnthropicLLM):
+    _semaphore = asyncio.Semaphore(1)       # one call at a time
+    _min_interval = 60.0 / 3                # 20s between calls
+
+    async def ainvoke(self, *args, **kwargs):
+        async with self._semaphore:
+            wait = self._min_interval - (now - self._last_request)
+            if wait > 0:
+                await asyncio.sleep(wait)
+            self._last_request = time.monotonic()
+            return await super().ainvoke(*args, **kwargs)
+```
+
+Conservative math: each extraction request sends the full schema + chunk + prompt (~2-3K input tokens). At 3 requests/minute, that's ~9K tokens/minute — just under the 10K limit. The semaphore serializes calls so there's no burst.
+
+It ran for 44 minutes. 113 chunks. **Zero 429 errors.**
+
+The result:
+
+| | Count |
+|---|---|
+| **Total nodes** | 2,537 |
+| **Total relationships** | 4,135 |
+| **Places** | 586 |
+| **People** | 437 |
+| **Documents** | 426 |
+| **Time Spans** | 255 |
+| **Events** | 245 |
+| **Cultural Groups** | 227 |
+| **Artifacts** | 202 |
+| **Sites** | 45 |
+| **Chunks** | 113 |
+
+Entity resolution merged 2,423 candidate nodes down to 1,527 unique entities — and this time it actually completed, because entity resolution in `SimpleKGPipeline` is a Cypher query (`apoc.refactor.mergeNodes`), not an LLM call. No API dependency, takes seconds.
+
+The graph pruner also did its job, cutting 234 relationships that didn't match our CIDOC-CRM patterns. Haiku occasionally generated relationships between wrong node types (a Person `P53_HAS_FORMER_OR_CURRENT_LOCATION` to another Person, for instance). The schema enforcement caught these.
+
+### Vector Search Works
+
+The pipeline stores 768-dimensional Nomic embeddings on every Chunk node, but doesn't create a vector index. One Cypher statement fixes that:
+
+```cypher
+CREATE VECTOR INDEX chunk_embedding_index IF NOT EXISTS
+FOR (c:Chunk) ON (c.embedding)
+OPTIONS {indexConfig: {
+  `vector.dimensions`: 768,
+  `vector.similarity_function`: 'cosine'
+}}
+```
+
+Then you can do similarity search directly in Neo4j Browser:
+
+```cypher
+-- Find a seed chunk, then search for similar ones
+MATCH (c:Chunk) WHERE c.text CONTAINS 'fort'
+WITH c LIMIT 1
+CALL db.index.vector.queryNodes('chunk_embedding_index', 10, c.embedding)
+YIELD node, score
+WHERE node <> c
+RETURN score, left(node.text, 300) AS text
+ORDER BY score DESC
+```
+
+Or traverse from similar chunks into the knowledge graph:
+
+```cypher
+MATCH (c:Chunk) WHERE c.text CONTAINS 'Shawnee'
+WITH c LIMIT 1
+CALL db.index.vector.queryNodes('chunk_embedding_index', 5, c.embedding)
+YIELD node, score
+MATCH (entity)-[:FROM_CHUNK]->(node)
+RETURN score, labels(entity)[0] AS type, entity.name AS name
+ORDER BY score DESC
+```
+
+This is the bridge between the two interaction models we identified earlier: vector search finds relevant chunks (the RAG path), and graph traversal from those chunks finds structured entities and relationships (the explorer path). Both work on the same data.
+
+### Where things stand
+
+We now have a populated knowledge graph from a real archaeological source — a 429K-character dissertation on Indian warfare and settlement in western Virginia. The extraction used Haiku (cheapest tier, free), local Nomic embeddings (free), and the full CIDOC-CRM ontology. Total cost: $0.
+
+The two-pipeline comparison is clearer now:
+
+| | **Custom pipeline** | **SimpleKGPipeline** |
+|---|---|---|
+| **Status** | Ran out of API credits mid-extraction | Complete, graph populated |
+| **Code** | ~1,500 lines across 6 modules | ~300 lines, one file + throttle wrapper |
+| **Extraction model** | Sonnet (expensive) | Haiku (free tier) |
+| **Nodes extracted** | 5,249 (partial, 29% sections failed silently) | 2,537 (complete, all chunks processed) |
+| **Entity resolution** | Custom fuzzy matching (never ran) | Built-in Cypher merge (completed) |
+| **Vector search** | Not implemented | Working |
+| **Rate limiting** | Anthropic SDK retries (insufficient) | Custom throttle wrapper (zero 429s) |
+
+SimpleKGPipeline with a throttle wrapper got us from zero to a queryable knowledge graph in one session. The custom pipeline has better PDF preprocessing and more control, but it never finished.
+
+### What's next
+
+1. Run more PDFs through the throttled pipeline — the First Peoples document and the 1833 Kercheval history
+2. Compare Haiku extraction quality against the partial Sonnet results from the custom pipeline
+3. Build the entity-first explorer UI on top of the graph
+4. Evaluate whether the custom pipeline's better PDF preprocessing (kreuzberg + OCR cleanup) makes a meaningful difference in extraction quality vs. SimpleKGPipeline's built-in PDF reader
