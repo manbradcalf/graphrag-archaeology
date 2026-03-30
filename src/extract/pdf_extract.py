@@ -38,6 +38,9 @@ def extract_two_column(pdf_path, column_split=0.5):
             left_text = left.extract_text() or ""
             right_text = right.extract_text() or ""
 
-            pages_text.append(left_text + "\n\n" + right_text)
+            pages_text.append(
+                f"<!-- PAGE {page.page_number} -->\n\n"
+                + left_text + "\n\n" + right_text
+            )
 
     return "\n\n".join(pages_text)

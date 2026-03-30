@@ -9,7 +9,7 @@ import asyncio
 from pathlib import Path
 
 from src.extract.ocr_cleanup import clean_ocr_text
-from src.extract.pdf_extract import extract_via_kreuzberg
+from src.extract.pdf_extract import extract_two_column
 
 
 def extract_all(
@@ -51,7 +51,7 @@ def extract_all(
 
         print(f"  Extracting {pdf_path.name}...")
         try:
-            text = extract_via_kreuzberg(pdf_path)
+            text = extract_two_column(pdf_path)
         except Exception as e:
             print(f"  ERROR extracting {pdf_path.name}: {e}")
             continue
