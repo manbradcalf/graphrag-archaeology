@@ -1,13 +1,14 @@
 from pathlib import Path
 
 import pdfplumber
-from kreuzberg import ExtractionConfig, OutputFormat, extract_file_sync
+from kreuzberg import ExtractionConfig, OutputFormat, PageConfig, extract_file_sync
 
 
 def extract_via_kreuzberg(pdf_path):
     config = ExtractionConfig(
         output_format=OutputFormat.MARKDOWN,
         include_document_structure=True,
+        pages=PageConfig(extract_pages=True, insert_page_markers=True),
     )
     result = extract_file_sync(Path(pdf_path), config=config)
     return result.content

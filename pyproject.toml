@@ -9,7 +9,7 @@ dependencies = [
     "einops>=0.8.2",
     "gliner2>=1.2.4",
     "graphlint",
-    "kreuzberg>=4.4.5",
+    "kreuzberg>=4.6.3",
     "neo4j>=6.1.0",
     "neo4j-graphrag>=1.14.0",
     "ollama>=0.6.1",
@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-graphlint = { path = "../../../../../graphlint", editable = true }
+graphlint = { path = "../../graphlint", editable = true }
 
 [tool.pyright]
 pythonVersion = "3.11"

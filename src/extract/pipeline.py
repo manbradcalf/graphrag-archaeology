@@ -18,7 +18,7 @@ def extract_all(
     *,
     skip_existing: bool = True,
     regex_cleanup: bool = True,
-    cleanup: bool = True,
+    cleanup: bool = False,
 ) -> list[Path]:
     """Extract all PDFs in a directory to cleaned markdown.
 

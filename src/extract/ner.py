@@ -25,6 +25,7 @@ from pathlib import Path
 import anthropic
 
 from src.config import ANTHROPIC_API_KEY, DATA_DIR, MD_DIR, NER_MODEL
+from src.extract.sectioning import split_by_pages
 from src.schema import ENTITY_TYPES
 
 logger = logging.getLogger(__name__)
@@ -33,16 +34,17 @@ logger = logging.getLogger(__name__)
 # Data model
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ExtractedEntity:
     """A single entity extracted from a document section."""
 
-    name: str                          # canonical name
-    entity_type: str                   # Neo4j label from ENTITY_TYPES (e.g. "E74_Group")
+    name: str  # canonical name
+    entity_type: str  # Neo4j label from ENTITY_TYPES (e.g. "E74_Group")
     aliases: list[str] = field(default_factory=list)  # alternative names/spellings
-    description: str = ""              # brief description from source context
-    source_section: str = ""           # section identifier this was extracted from
-    confidence: float = 1.0            # 0.0-1.0
+    description: str = ""  # brief description from source context
+    source_section: str = ""  # section identifier this was extracted from
+    confidence: float = 1.0  # 0.0-1.0
 
     def __post_init__(self) -> None:
         if self.entity_type not in ENTITY_TYPES:
@@ -59,7 +61,8 @@ class ExtractedEntity:
 # ---------------------------------------------------------------------------
 
 NER_ENTITY_TYPES: dict[str, str] = {
-    k: v for k, v in ENTITY_TYPES.items()
+    k: v
+    for k, v in ENTITY_TYPES.items()
     if k not in ("E31_Document", "S19_Encounter_Event")
 }
 
@@ -256,6 +259,7 @@ def _split_by_paragraphs(
 # Single-section extraction
 # ---------------------------------------------------------------------------
 
+
 async def extract_entities_from_section(
     client: anthropic.AsyncAnthropic,
     section_text: str,
@@ -328,27 +332,36 @@ async def _call_with_retries(
         except (json.JSONDecodeError, KeyError, ValueError) as e:
             logger.warning(
                 "Parse error on section %r (attempt %d/%d): %s",
-                section_id, attempt + 1, max_retries, e,
+                section_id,
+                attempt + 1,
+                max_retries,
+                e,
             )
             if attempt == max_retries - 1:
                 logger.error(
                     "Failed to parse entities from section %r after %d attempts",
-                    section_id, max_retries,
+                    section_id,
+                    max_retries,
                 )
                 return []
             await asyncio.sleep(1)
         except Exception as e:
             logger.warning(
                 "Error on section %r (attempt %d/%d): %s",
-                section_id, attempt + 1, max_retries, e,
+                section_id,
+                attempt + 1,
+                max_retries,
+                e,
             )
             if attempt == max_retries - 1:
                 logger.error(
                     "Failed section %r after %d attempts: %s",
-                    section_id, max_retries, e,
+                    section_id,
+                    max_retries,
+                    e,
                 )
                 return []
-            await asyncio.sleep(2 ** attempt)
+            await asyncio.sleep(2**attempt)
 
     return []
 
@@ -390,7 +403,8 @@ def _parse_entities(raw_json: str, section_id: str) -> list[ExtractedEntity]:
             else:
                 logger.warning(
                     "Skipping entity with unknown type %r: %s",
-                    entity_type, item.get("name", "?"),
+                    entity_type,
+                    item.get("name", "?"),
                 )
                 continue
 
@@ -402,14 +416,16 @@ def _parse_entities(raw_json: str, section_id: str) -> list[ExtractedEntity]:
         if not name:
             continue
 
-        entities.append(ExtractedEntity(
-            name=name,
-            entity_type=entity_type,
-            aliases=[a.strip() for a in item.get("aliases", []) if a.strip()],
-            description=item.get("description", "").strip(),
-            source_section=section_id,
-            confidence=float(item.get("confidence", 1.0)),
-        ))
+        entities.append(
+            ExtractedEntity(
+                name=name,
+                entity_type=entity_type,
+                aliases=[a.strip() for a in item.get("aliases", []) if a.strip()],
+                description=item.get("description", "").strip(),
+                source_section=section_id,
+                confidence=float(item.get("confidence", 1.0)),
+            )
+        )
 
     return entities
 
@@ -417,6 +433,7 @@ def _parse_entities(raw_json: str, section_id: str) -> list[ExtractedEntity]:
 # ---------------------------------------------------------------------------
 # Document-level extraction
 # ---------------------------------------------------------------------------
+
 
 async def extract_entities_from_document(
     md_path: Path,
@@ -440,10 +457,12 @@ async def extract_entities_from_document(
     text = md_path.read_text(encoding="utf-8")
     doc_name = md_path.stem
 
-    sections = split_into_sections(text)
+    sections = split_by_pages(text)
     logger.info(
         "Extracting entities from %s: %d sections, %d chars",
-        doc_name, len(sections), len(text),
+        doc_name,
+        len(sections),
+        len(text),
     )
 
     client = anthropic.AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
@@ -470,7 +489,10 @@ async def extract_entities_from_document(
 
     logger.info(
         "Extracted %d entities from %s in %.1fs (%d sections)",
-        len(all_entities), doc_name, elapsed, len(sections),
+        len(all_entities),
+        doc_name,
+        elapsed,
+        len(sections),
     )
 
     return all_entities
@@ -479,6 +501,7 @@ async def extract_entities_from_document(
 # ---------------------------------------------------------------------------
 # Batch extraction — all documents
 # ---------------------------------------------------------------------------
+
 
 def _save_entities(
     entities: list[ExtractedEntity],
@@ -570,7 +593,8 @@ def extract_all_entities(
     total = sum(len(v) for v in results.values())
     logger.info(
         "Entity extraction complete: %d entities from %d documents",
-        total, len(results),
+        total,
+        len(results),
     )
 
     return results

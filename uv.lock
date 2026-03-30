@@ -100,8 +100,8 @@ requires-dist = [
     { name = "anthropic", specifier = ">=0.84.0" },
     { name = "einops", specifier = ">=0.8.2" },
     { name = "gliner2", specifier = ">=1.2.4" },
-    { name = "graphlint", editable = "../../../../../graphlint" },
-    { name = "kreuzberg", specifier = ">=4.4.5" },
+    { name = "graphlint", editable = "../../graphlint" },
+    { name = "kreuzberg", specifier = ">=4.6.3" },
     { name = "neo4j", specifier = ">=6.1.0" },
     { name = "neo4j-graphrag", specifier = ">=1.14.0" },
     { name = "ollama", specifier = ">=0.6.1" },
@@ -521,7 +521,7 @@ wheels = [
 [[package]]
 name = "graphlint"
 version = "0.1.0"
-source = { editable = "../../../../../graphlint" }
+source = { editable = "../../graphlint" }
 dependencies = [
     { name = "fastapi" },
     { name = "jinja2" },
@@ -784,14 +784,14 @@ wheels = [
 
 [[package]]
 name = "kreuzberg"
-version = "4.4.5"
+version = "4.6.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/79/44/ddcba3d408c34eda450e9434f9a4c7827d681b783afbffc81b807a2ede3f/kreuzberg-4.4.5.tar.gz", hash = "sha256:7677859d748da3dbf223656b4c576747f629194a8da907e8630fb79d54ad06cb", size = 1773905, upload-time = "2026-03-10T17:28:48.388Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/98/6e/a04a24f901e772ccdc06920fe3c0b5d366239dd5a11c4ce77c5f6815ca15/kreuzberg-4.6.3.tar.gz", hash = "sha256:eaea80d5395f35761cce9396660cf6cb06d9b94ed20d616b137c736b236c4eb0", size = 2173464, upload-time = "2026-03-27T07:54:35.455Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/75/a4/fca7bf13988732e0c3b6095e1b12610d90b93361b0fb274af5bc22c32cc9/kreuzberg-4.4.5-cp310-abi3-macosx_14_0_arm64.whl", hash = "sha256:ddcc32684cb73c7e9a0190f2b106ea0b7a909fbc9ed309f184d92fc73608febb", size = 32746438, upload-time = "2026-03-10T17:28:28.835Z" },
-    { url = "https://files.pythonhosted.org/packages/05/a5/c32d4645edef816966e6b3cc2e38109120e780ec0a4aad9e0ec2685f0afa/kreuzberg-4.4.5-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:203d0899b83aad8b95ee9d2e04cdc93d8a3ba0f7ce5dc811febe411dd6f4d865", size = 38447045, upload-time = "2026-03-10T17:28:33.636Z" },
-    { url = "https://files.pythonhosted.org/packages/21/40/060478a296ac494a5476fbc9b53c1acacbdb51bfd483034a1f8cb47cef59/kreuzberg-4.4.5-cp310-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:5e769448ea1aaa75b4af232b465d773d1bf452233924c84880546f5f6911d721", size = 37388546, upload-time = "2026-03-10T17:28:38.593Z" },
-    { url = "https://files.pythonhosted.org/packages/a2/a0/3e4fe7bebcab21224136f1ed584be20af44f63e818f34149800f70f8941c/kreuzberg-4.4.5-cp310-abi3-win_amd64.whl", hash = "sha256:bd7421136a748338208f02c1ade55e5539b4719a43135db0854cdfdc275161ea", size = 38853295, upload-time = "2026-03-10T17:28:43.992Z" },
+    { url = "https://files.pythonhosted.org/packages/ed/6d/ca7f91c7da9d22841a618350dc085ec0d543e0bc916dab1c905029412e24/kreuzberg-4.6.3-cp310-abi3-macosx_14_0_arm64.whl", hash = "sha256:2a01e9bbdf0d0d316bbc26873fb40a648ce5a2cd60fdcafc62d046cfe1bace4b", size = 51045873, upload-time = "2026-03-27T07:54:21.728Z" },
+    { url = "https://files.pythonhosted.org/packages/e3/4c/c6a777d3a90e4fb8bb3bc128d15b9767f47dac52fa5fc93b3f86bcfb3390/kreuzberg-4.6.3-cp310-abi3-manylinux_2_39_aarch64.whl", hash = "sha256:c265ebd92e5ce4ab3d90cc6ff74a100abe6de92c067a3cffd7988e75d205e9ca", size = 59278814, upload-time = "2026-03-27T07:54:25.443Z" },
+    { url = "https://files.pythonhosted.org/packages/6d/cc/87494127d7b991852b3e2e53b975203e1ca6296076d1886448574d526433/kreuzberg-4.6.3-cp310-abi3-manylinux_2_39_x86_64.whl", hash = "sha256:43f3db7ada83f11bf297a14a151769b0d8572e1d0931c7bb6fe20a70c70d26ea", size = 59017388, upload-time = "2026-03-27T07:54:29.036Z" },
+    { url = "https://files.pythonhosted.org/packages/6d/7a/d8fe90973f1047576832f019d1cc716e8c00be52fee8a48fe89712d299ab/kreuzberg-4.6.3-cp310-abi3-win_amd64.whl", hash = "sha256:fc0afd51f0a22808e87a76351b105bb82f7b352b2e7b3b33cbbc09e4b54e55df", size = 58766457, upload-time = "2026-03-27T07:54:32.361Z" },
 ]
 
 [[package]]

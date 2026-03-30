@@ -165,7 +165,7 @@ def resolve_entities(
     by_type: dict[str, list[dict]] = {}
     for doc_name, entities in all_entities.items():
         for ent in entities:
-            etype = ent.get("type", "")
+            etype = ent.get("entity_type", "")
             if etype not in by_type:
                 by_type[etype] = []
             # Attach source document for provenance
@@ -375,7 +375,4 @@ def load_entity_registry(input_path: Path) -> list[CanonicalEntity]:
     list[CanonicalEntity]
     """
     data = json.loads(input_path.read_text())
-    return [
-        CanonicalEntity(**ent)
-        for ent in data["entities"]
-    ]
+    return [CanonicalEntity(**ent) for ent in data["entities"]]

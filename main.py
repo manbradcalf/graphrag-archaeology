@@ -19,7 +19,6 @@ Usage:
 """
 
 import argparse
-import json
 import logging
 import sys
 from pathlib import Path
@@ -43,12 +42,15 @@ def step_extract(args):
         Path(args.pdf_dir),
         Path(args.output_dir),
         skip_existing=not args.force,
-        cleanup=args.cleanup,
+        cleanup=args.llm_cleanup,
     )
 
 
 def step_chunk(args):
-    """Step 2: Chunk markdown files (preview — chunks are generated on-the-fly for loading)."""
+    """Step 2: Chunk markdown files (preview — chunks are generated on-the-fly for loading).
+
+    TODO: Embed these chunks to later store in a vector store or Neo4j.
+    """
     from src.extract.chunker import chunk_file
 
     print("=" * 60)
@@ -58,7 +60,9 @@ def step_chunk(args):
     for md_path in sorted(md_dir.glob("*.md")):
         chunks = chunk_file(md_path)
         sizes = [len(c.text) for c in chunks]
-        print(f"  {md_path.name}: {len(chunks)} chunks, avg {sum(sizes)//len(sizes)} chars")
+        print(
+            f"  {md_path.name}: {len(chunks)} chunks, avg {sum(sizes) // len(sizes)} chars"
+        )
 
 
 def step_ner(args):
@@ -99,7 +103,6 @@ def step_relations(args):
     all_relations = extract_all_relations(
         md_dir=Path(args.output_dir),
         all_entities=all_entities,
-        force=args.force,
     )
     for doc_name, relations in all_relations.items():
         print(f"  {doc_name}: {len(relations)} relationships")
@@ -241,7 +244,16 @@ if __name__ == "__main__":
         "step",
         nargs="?",
         default="all",
-        choices=["all", "extract", "chunk", "ner", "relations", "resolve", "load", "embed"],
+        choices=[
+            "all",
+            "extract",
+            "chunk",
+            "ner",
+            "relations",
+            "resolve",
+            "load",
+            "embed",
+        ],
         help="Which pipeline step to run (default: all)",
     )
     parser.add_argument("--pdf-dir", default="data/pdf")
@@ -250,7 +262,9 @@ if __name__ == "__main__":
         "--force", action="store_true", help="Re-run even if cached output exists"
     )
     parser.add_argument(
-        "--llm-cleanup", action="store_true", help="Use Claude for OCR cleanup (costs money)"
+        "--llm-cleanup",
+        action="store_true",
+        help="Use Claude for OCR cleanup (costs money)",
     )
     args = parser.parse_args()
 

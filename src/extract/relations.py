@@ -17,10 +17,12 @@ import logging
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from .ner import ExtractedEntity
 
 import anthropic
 
 from src.config import ANTHROPIC_API_KEY, NER_MODEL
+from src.extract.sectioning import split_by_pages
 from src.schema import (
     ENTITY_TYPES,
     RELATIONSHIP_CONSTRAINTS,
@@ -29,6 +31,34 @@ from src.schema import (
 )
 
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Throttle — prevents 429s on tight rate limits
+# ---------------------------------------------------------------------------
+MAX_REQUESTS_PER_MINUTE = 3
+
+
+class ThrottledClient:
+    """Wraps AsyncAnthropic with token-bucket throttle."""
+
+    def __init__(
+        self, client: anthropic.AsyncAnthropic, rpm: int = MAX_REQUESTS_PER_MINUTE
+    ):
+        self._client = client
+        self._semaphore = asyncio.Semaphore(1)
+        self._min_interval = 60.0 / rpm
+        self._last_request = 0.0
+
+    async def create(self, **kwargs):
+        async with self._semaphore:
+            now = time.monotonic()
+            wait = self._min_interval - (now - self._last_request)
+            if wait > 0:
+                logger.debug("Throttling: waiting %.1fs before next API call", wait)
+                await asyncio.sleep(wait)
+            self._last_request = time.monotonic()
+            return await self._client.messages.create(**kwargs)
+
 
 # Relationship types that map to node properties rather than graph edges.
 # These use free-text targets (e.g., "chert", "projectile point") and do not
@@ -48,6 +78,7 @@ EXTRACTABLE_RELATION_TYPES = [
 # Data model
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ExtractedRelation:
     """A single relationship extracted from a document section."""
@@ -65,6 +96,7 @@ class ExtractedRelation:
 # Prompt construction
 # ---------------------------------------------------------------------------
 
+
 def _build_constraint_description() -> str:
     """Build a human-readable description of valid relationship constraints."""
     lines: list[str] = []
@@ -73,7 +105,11 @@ def _build_constraint_description() -> str:
         if not constraint:
             continue
         sources = ", ".join(constraint["source"]) if constraint["source"] else "*"
-        targets = ", ".join(constraint["target"]) if constraint["target"] else "(free text value)"
+        targets = (
+            ", ".join(constraint["target"])
+            if constraint["target"]
+            else "(free text value)"
+        )
         display = RELATIONSHIP_DISPLAY_LABELS.get(rt, rt)
         lines.append(f"  {rt}  ({display})")
         lines.append(f"    Source types: {sources}")
@@ -162,7 +198,10 @@ def _build_user_prompt(
 # Validation
 # ---------------------------------------------------------------------------
 
-def _validate_relation(raw: dict, entity_name_set: set[str]) -> ExtractedRelation | None:
+
+def _validate_relation(
+    raw: dict, entity_name_set: set[str]
+) -> ExtractedRelation | None:
     """Validate a single raw relation dict against the SHACL constraints.
 
     Returns an ExtractedRelation if valid, None otherwise.
@@ -192,7 +231,9 @@ def _validate_relation(raw: dict, entity_name_set: set[str]) -> ExtractedRelatio
     if confidence < 0.5:
         logger.debug(
             "Skipping low-confidence relation (%.2f): %s -> %s",
-            confidence, head_name, tail_name,
+            confidence,
+            head_name,
+            tail_name,
         )
         return None
 
@@ -202,7 +243,9 @@ def _validate_relation(raw: dict, entity_name_set: set[str]) -> ExtractedRelatio
         if head_type not in constraint["source"]:
             logger.debug(
                 "Head type %r not valid for %s (expected %s)",
-                head_type, relation_type, constraint["source"],
+                head_type,
+                relation_type,
+                constraint["source"],
             )
             return None
 
@@ -211,7 +254,9 @@ def _validate_relation(raw: dict, entity_name_set: set[str]) -> ExtractedRelatio
             if constraint["target"] and tail_type not in constraint["target"]:
                 logger.debug(
                     "Tail type %r not valid for %s (expected %s)",
-                    tail_type, relation_type, constraint["target"],
+                    tail_type,
+                    relation_type,
+                    constraint["target"],
                 )
                 return None
 
@@ -256,8 +301,9 @@ def _validate_relation(raw: dict, entity_name_set: set[str]) -> ExtractedRelatio
 # Section-level extraction
 # ---------------------------------------------------------------------------
 
+
 async def extract_relations_from_section(
-    client: anthropic.AsyncAnthropic,
+    client: ThrottledClient,
     section_text: str,
     entity_names: list[str],
     section_id: str,
@@ -283,7 +329,7 @@ async def extract_relations_from_section(
     async def _call() -> list[ExtractedRelation]:
         for attempt in range(3):
             try:
-                response = await client.messages.create(
+                response = await client.create(
                     model=model,
                     max_tokens=4096,
                     system=_SYSTEM_PROMPT,
@@ -304,7 +350,8 @@ async def extract_relations_from_section(
                 if not isinstance(raw_relations, list):
                     logger.warning(
                         "Section %s: expected JSON array, got %s",
-                        section_id, type(raw_relations).__name__,
+                        section_id,
+                        type(raw_relations).__name__,
                     )
                     return []
 
@@ -317,35 +364,33 @@ async def extract_relations_from_section(
 
                 logger.info(
                     "Section %s: extracted %d relations (%d raw, %d valid)",
-                    section_id, len(relations), len(raw_relations), len(relations),
+                    section_id,
+                    len(relations),
+                    len(raw_relations),
+                    len(relations),
                 )
                 return relations
 
             except json.JSONDecodeError as exc:
                 logger.warning(
                     "Section %s attempt %d: JSON parse error: %s",
-                    section_id, attempt + 1, exc,
+                    section_id,
+                    attempt + 1,
+                    exc,
                 )
                 if attempt < 2:
                     await asyncio.sleep(2)
-            except anthropic.RateLimitError:
-                wait = 2 ** (attempt + 1)
-                logger.warning(
-                    "Section %s: rate limited, waiting %ds...",
-                    section_id, wait,
-                )
-                await asyncio.sleep(wait)
             except Exception as exc:
                 logger.warning(
                     "Section %s attempt %d: %s",
-                    section_id, attempt + 1, exc,
+                    section_id,
+                    attempt + 1,
+                    exc,
                 )
                 if attempt < 2:
                     await asyncio.sleep(2)
                 else:
-                    logger.error(
-                        "Section %s: failed after 3 attempts", section_id
-                    )
+                    logger.error("Section %s: failed after 3 attempts", section_id)
 
         return []
 
@@ -359,7 +404,10 @@ async def extract_relations_from_section(
 # Document-level extraction
 # ---------------------------------------------------------------------------
 
-def _split_into_sections(text: str, min_chars: int = 3000, max_chars: int = 5000) -> list[tuple[str, str]]:
+
+def _split_into_sections(
+    text: str, min_chars: int = 3000, max_chars: int = 5000
+) -> list[tuple[str, str]]:
     """Split markdown text into sections suitable for relation extraction.
 
     Splits on heading boundaries (## or ###). Merges small sections up to
@@ -418,9 +466,10 @@ def _slugify(text: str, max_len: int = 40) -> str:
 
 async def extract_relations_from_document(
     md_path: Path,
-    entities: list[dict],
+    entities: list[ExtractedEntity],
+    output_path: Path | None = None,
     model: str | None = None,
-    max_concurrent: int = 5,
+    max_concurrent: int = 2,
 ) -> list[ExtractedRelation]:
     """Extract relationships from an entire markdown document.
 
@@ -428,6 +477,7 @@ async def extract_relations_from_document(
         md_path: Path to the cleaned markdown file.
         entities: Entity list from the NER step. Each entity is a dict with
             at least a "name" key (and optionally "aliases").
+        output_path: If provided, saves incrementally after each section.
         model: Anthropic model name. Defaults to NER_MODEL from config.
         max_concurrent: Maximum concurrent API requests.
 
@@ -439,32 +489,36 @@ async def extract_relations_from_document(
 
     text = md_path.read_text(encoding="utf-8")
     doc_name = md_path.stem
-    sections = _split_into_sections(text)
+    sections = split_by_pages(text, min_chars=3000)
 
     # Build entity name list including aliases
     entity_names: list[str] = []
     seen: set[str] = set()
-    for ent in entities:
-        name = ent.get("name", "")
+    for ent in entities or []:
+        name = ent.name
+        logger.info("Entity is %s", name)
         if name and name not in seen:
             entity_names.append(name)
             seen.add(name)
-        for alias in ent.get("aliases", []):
+        for alias in ent.aliases or []:
             if alias and alias not in seen:
                 entity_names.append(alias)
                 seen.add(alias)
 
     logger.info(
         "Document %s: %d sections, %d entity names",
-        doc_name, len(sections), len(entity_names),
+        doc_name,
+        len(sections),
+        len(entity_names),
     )
 
-    client = anthropic.AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
+    client = ThrottledClient(anthropic.AsyncAnthropic(api_key=ANTHROPIC_API_KEY))
     semaphore = asyncio.Semaphore(max_concurrent)
     start_time = time.time()
+    all_relations: list[ExtractedRelation] = []
 
-    tasks = [
-        extract_relations_from_section(
+    for section_id, section_text in sections:
+        batch = await extract_relations_from_section(
             client=client,
             section_text=section_text,
             entity_names=entity_names,
@@ -472,16 +526,16 @@ async def extract_relations_from_document(
             model=model,
             semaphore=semaphore,
         )
-        for section_id, section_text in sections
-    ]
-
-    results = await asyncio.gather(*tasks)
-    all_relations = [rel for batch in results for rel in batch]
+        all_relations.extend(batch)
+        if output_path:
+            _save_relations(all_relations, output_path)
 
     elapsed = time.time() - start_time
     logger.info(
         "Document %s: extracted %d relations in %.1fs",
-        doc_name, len(all_relations), elapsed,
+        doc_name,
+        len(all_relations),
+        elapsed,
     )
 
     return all_relations
@@ -491,9 +545,10 @@ async def extract_relations_from_document(
 # Multi-document synchronous wrapper
 # ---------------------------------------------------------------------------
 
+
 def extract_all_relations(
     md_dir: Path,
-    all_entities: dict[str, list[dict]],
+    all_entities: dict[str, list[ExtractedEntity]],
     model: str | None = None,
 ) -> dict[str, list[ExtractedRelation]]:
     """Extract relationships from all markdown documents in a directory.
@@ -532,30 +587,38 @@ def extract_all_relations(
             continue
 
         logger.info("Extracting relations from %s...", doc_name)
+        logger.info("Model is %s", model)
+        output_path = output_dir / f"{doc_name}.json"
         relations = asyncio.run(
-            extract_relations_from_document(md_path, entities, model=model)
+            extract_relations_from_document(
+                md_path, entities, output_path=output_path, model=model
+            )
         )
         results[doc_name] = relations
-
-        # Save intermediate results
-        output_path = output_dir / f"{doc_name}.json"
-        _save_relations(relations, output_path)
-        logger.info(
-            "Saved %d relations to %s", len(relations), output_path
-        )
+        logger.info("Saved %d relations to %s", len(relations), output_path)
 
     return results
 
 
-def _save_relations(relations: list[ExtractedRelation], path: Path) -> None:
+def _save_relations(
+    relations: list[ExtractedRelation], path: Path, model: str | None = None
+) -> None:
     """Serialize relations to JSON for intermediate storage."""
-    data = [asdict(r) for r in relations]
-    path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    from datetime import datetime, timezone
+
+    output = {
+        "extracted_at": datetime.now(timezone.utc).isoformat(),
+        "model": model or NER_MODEL,
+        "count": len(relations),
+        "relations": [asdict(r) for r in relations],
+    }
+    path.write_text(json.dumps(output, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 def load_relations(path: Path) -> list[ExtractedRelation]:
     """Load previously saved relations from a JSON file."""
-    data = json.loads(path.read_text(encoding="utf-8"))
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    data = raw["relations"]
     return [
         ExtractedRelation(
             head_name=r["head_name"],
