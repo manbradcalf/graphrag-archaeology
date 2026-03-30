@@ -2,7 +2,7 @@
 
 Loads canonical entities, relationships, and text chunks into Neo4j.
 Uses MERGE for idempotent entity loading and UNWIND for batch operations.
-Property names match SHACL/graphlint expectations (prefLabel, P3_has_note, etc.).
+Property names match SHACL/graphlint expectations (name, P3_has_note, etc.).
 
 Steps 7-8 of the pipeline:
   - Entity and relationship loading
@@ -103,7 +103,7 @@ def load_entities(driver: neo4j.Driver, entities: list[CanonicalEntity]) -> None
 
     Each entity gets:
       - Neo4j label from entity_type (e.g., E27_Site, E74_Group)
-      - Properties: entity_id, prefLabel, P3_has_note, aliases
+      - Properties: entity_id, name, P3_has_note, aliases
       - P2_has_type where applicable (Groups, Events, Places, Documents)
 
     Uses UNWIND for batch loading. MERGE on entity_id for idempotency.
@@ -114,7 +114,7 @@ def load_entities(driver: neo4j.Driver, entities: list[CanonicalEntity]) -> None
     for ent in entities:
         props = {
             "entity_id": ent.entity_id,
-            "prefLabel": ent.name,
+            "name": ent.name,
             "P3_has_note": ent.description or "",
             "aliases": ent.aliases or [],
         }
@@ -126,7 +126,7 @@ def load_entities(driver: neo4j.Driver, entities: list[CanonicalEntity]) -> None
             cypher = (
                 f"UNWIND $batch AS props "
                 f"MERGE (n:{label} {{entity_id: props.entity_id}}) "
-                f"SET n.prefLabel = props.prefLabel, "
+                f"SET n.name = props.name, "
                 f"    n.P3_has_note = props.P3_has_note, "
                 f"    n.aliases = props.aliases"
             )
@@ -237,13 +237,12 @@ def load_relationships(
     # types cannot be parameterized in standard Cypher.
     with driver.session(database=NEO4J_DATABASE) as session:
         for rel_type, batch in edge_batches.items():
-            # Relationship types are uppercase identifiers from our schema,
-            # safe for direct interpolation (validated against RELATIONSHIP_TYPES).
+            label = _escape_label(rel_type)
             cypher = (
                 "UNWIND $batch AS r "
                 "MATCH (h {entity_id: r.head_id}) "
                 "MATCH (t {entity_id: r.tail_id}) "
-                f"MERGE (h)-[rel:{rel_type}]->(t) "
+                f"MERGE (h)-[rel:{label}]->(t) "
                 "SET rel.confidence = r.confidence, "
                 "    rel.source_section = r.source_section"
             )
@@ -387,7 +386,7 @@ def link_chunks_to_documents(
     """Create FROM_DOCUMENT relationships from Chunk nodes to Document nodes.
 
     If a Document node matching the chunk's document_name does not exist,
-    it is created with prefLabel set to document_name.
+    it is created with name set to document_name.
     """
     # Collect unique document names
     doc_names = sorted({c.document_name for c in chunks})
@@ -396,7 +395,7 @@ def link_chunks_to_documents(
         # Ensure Document nodes exist
         for doc_name in doc_names:
             session.run(
-                "MERGE (d:E31_Document {prefLabel: $name}) "
+                "MERGE (d:E31_Document {name: $name}) "
                 "ON CREATE SET d.entity_id = 'doc-' + $name",
                 name=doc_name,
             )
@@ -409,7 +408,7 @@ def link_chunks_to_documents(
         session.run(
             "UNWIND $batch AS pair "
             "MATCH (c:Chunk {chunk_id: pair.chunk_id}) "
-            "MATCH (d:E31_Document {prefLabel: pair.doc_name}) "
+            "MATCH (d:E31_Document {name: pair.doc_name}) "
             "MERGE (c)-[:FROM_DOCUMENT]->(d)",
             batch=batch,
         )
