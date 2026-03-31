@@ -25,3 +25,6 @@ data/
 
 # Kreuzberg extraction cache
 .kreuzberg/
+
+# Pipeline logs
+pipeline.log
