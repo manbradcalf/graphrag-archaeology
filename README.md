@@ -21,10 +21,6 @@ The pipeline does **not** yet embed chunks or create vector indexes for semantic
 - Auto-generate SHACL files from an ontology
 - Option to use Neo4j Graph Types rather than SHACL
 
-## Approach
-
-This is NOT standard GraphRAG (where a graph invisibly enhances retrieval for a chatbot). The graph is the interface — users browse entities, explore connections, and see source evidence directly.
-
 ## Tech Stack
 
 Neo4j, Claude, kreuzberg, SHACL/CIDOC-CRM
