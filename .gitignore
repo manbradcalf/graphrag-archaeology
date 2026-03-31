@@ -18,3 +18,10 @@ build/
 
 # Environment variables
 .env
+
+# Pipeline data (PDFs, extracted markdown, entities, relations)
+data/
+!data/.gitkeep
+
+# Kreuzberg extraction cache
+.kreuzberg/

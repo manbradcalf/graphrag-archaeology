@@ -12,9 +12,13 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-import time
 from pathlib import Path
+import sys
+import time
 from typing import Any, Optional, Union
+
+# Allow importing sibling modules from src/
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import neo4j
 from neo4j_graphrag.embeddings import SentenceTransformerEmbeddings
@@ -83,6 +87,7 @@ class ThrottledAnthropicLLM(AnthropicLLM):
                 await asyncio.sleep(wait)
             self._last_request = time.monotonic()
             return await super().ainvoke(input, message_history, system_instruction)
+
 
 # ---------------------------------------------------------------------------
 # Schema — CIDOC-CRM ontology mapped for SimpleKGPipeline
@@ -230,7 +235,8 @@ PATTERNS: list[tuple[str, str, str]] = [
 # ---------------------------------------------------------------------------
 
 PDF_FILES: list[Path] = [
-    PDF_DIR / "Indian warfare household competency and the settlement of the w.pdf",
+    PDF_DIR / "sample.pdf",
+    PDF_DIR / "259 ASV Newsletter Dec 2025.pdf",
 ]
 
 # ---------------------------------------------------------------------------
@@ -251,11 +257,18 @@ def _build_pipeline() -> tuple[SimpleKGPipeline, neo4j.Driver]:
     logger.info("Initializing LLM (%s): %s", LLM_PROVIDER, NER_MODEL)
     llm_params = {"max_tokens": 4096, "temperature": 0}
     if LLM_PROVIDER == "ollama":
-        llm = OllamaLLM(model_name=NER_MODEL, model_params={"format": "json", "options": {"temperature": 0}})
+        llm = OllamaLLM(
+            model_name=NER_MODEL,
+            model_params={"format": "json", "options": {"temperature": 0}},
+        )
     elif LLM_PROVIDER == "openai":
-        llm = OpenAILLM(model_name=NER_MODEL, model_params=llm_params, api_key=OPENAI_API_KEY)
+        llm = OpenAILLM(
+            model_name=NER_MODEL, model_params=llm_params, api_key=OPENAI_API_KEY
+        )
     else:
-        llm = ThrottledAnthropicLLM(model_name=NER_MODEL, model_params=llm_params, api_key=ANTHROPIC_API_KEY)
+        llm = ThrottledAnthropicLLM(
+            model_name=NER_MODEL, model_params=llm_params, api_key=ANTHROPIC_API_KEY
+        )
 
     logger.info("Initializing embedder: %s", EMBEDDING_MODEL)
     embedder = SentenceTransformerEmbeddings(

@@ -382,3 +382,75 @@ SimpleKGPipeline with a throttle wrapper got us from zero to a queryable knowled
 2. Compare Haiku extraction quality against the partial Sonnet results from the custom pipeline
 3. Build the entity-first explorer UI on top of the graph
 4. Evaluate whether the custom pipeline's better PDF preprocessing (kreuzberg + OCR cleanup) makes a meaningful difference in extraction quality vs. SimpleKGPipeline's built-in PDF reader
+
+## Session 3: Hardening the Custom Pipeline
+
+We came back to the custom pipeline and fixed the problems that stopped it from finishing last time. No new features — just making the thing actually run end-to-end without losing work.
+
+### Page-based sectioning
+
+The pipeline was splitting documents by markdown headings (`##`, `###`) for NER and relationship extraction. This was fragile — OCR'd documents produce garbage headings, and the section boundaries had nothing to do with the actual document structure.
+
+We switched to page-based sectioning. kreuzberg already supports `PageConfig(insert_page_markers=True)`, which inserts `<!-- PAGE N -->` markers into the extracted markdown. We wrote a shared `split_by_pages()` function that splits on these markers, with the same merge-small/split-large logic the old heading splitter had. Both NER and relationship extraction now use it.
+
+Then we hit a bigger problem: kreuzberg was interleaving two-column text. A page with left and right columns came out as alternating sentences from each column — completely unreadable. We switched PDF extraction to pdfplumber's crop-based column splitting, which reads left column first, then right, per page. We added `<!-- PAGE N -->` markers manually since pdfplumber gives us `page.page_number` directly. The output reads correctly now.
+
+This means `source_section` on entities and relationships is now a page reference like `sample/page-2` instead of a heading-derived slug like `sample/sec-003-late-archaic-trade`. More stable, more meaningful for provenance.
+
+### Incremental saves
+
+Previously, relationship extraction saved results per-document — if a 400-page PDF crashed on section 30, all completed sections were lost. We changed `extract_relations_from_document` to save after every section completes. The JSON file gets rewritten with the full list so far, so you can always pick up where you left off.
+
+We also added metadata to the relations JSON — `extracted_at` timestamp, `model` used, and `count`. Previously it was a bare JSON array with no way to know when or how it was generated.
+
+### Rate limiting done right
+
+The Anthropic Python SDK already has built-in retry with exponential backoff for 429s. We were reimplementing that manually with a `try/except anthropic.RateLimitError` block — removed it.
+
+What the SDK *doesn't* do is proactive throttling — it retries after getting a 429 rather than preventing them. For the free tier (50 req/min), you burn through your quota before a single retry fires. We ported the `ThrottledAnthropicLLM` pattern from the SimpleKGPipeline work into a `ThrottledClient` wrapper that serializes requests with a minimum interval:
+
+```python
+class ThrottledClient:
+    def __init__(self, client, rpm=3):
+        self._client = client
+        self._semaphore = asyncio.Semaphore(1)
+        self._min_interval = 60.0 / rpm
+        self._last_request = 0.0
+
+    async def create(self, **kwargs):
+        async with self._semaphore:
+            wait = self._min_interval - (time.monotonic() - self._last_request)
+            if wait > 0:
+                await asyncio.sleep(wait)
+            self._last_request = time.monotonic()
+            return await self._client.messages.create(**kwargs)
+```
+
+### Bug fixes
+
+A handful of bugs that prevented a clean run:
+
+- **`entity_type` key mismatch**: `step_resolve` in main.py converted entities to dicts with key `"entity_type"`, but `resolve_entities` looked for `"type"`. Every entity got an empty type string, which broke Neo4j loading (empty labels produce invalid Cypher).
+- **Cypher escaping**: relationship types with hyphens (like `P4_HAS_TIME-SPAN`) weren't backtick-escaped, causing syntax errors. Entity labels already had this fix; relationships didn't.
+- **`args.cleanup` → `args.llm_cleanup`**: argparse flag `--llm-cleanup` maps to `llm_cleanup`, not `cleanup`.
+- **Logger format strings**: several `logger.info("Entity is ", ent)` calls using comma-separated args instead of `%s` formatting, causing `TypeError: not all arguments converted`.
+- **Dict vs attribute access**: `ent.get("aliases", [])` on `ExtractedEntity` objects that use attribute access, not dict access.
+
+### Neo4j display
+
+Renamed the `prefLabel` property to `name` on all entity nodes. Neo4j Desktop picks `name` as the default display label, so nodes now show their actual names instead of empty alias arrays.
+
+### Pipeline scoping
+
+Discovered that removing PDFs from `data/pdf/` doesn't affect downstream steps — they work off cached output in `data/md/` and `data/entities/`. Moving processed PDFs to `data/pdf_holding/` left orphaned outputs that the pipeline happily reprocessed. Cleaned up the orphaned files manually. The pipeline still doesn't auto-scope downstream steps to what's in `data/pdf/` — that's a future fix.
+
+### Where things stand
+
+The custom pipeline now runs end-to-end on a sample document: extract → NER → relationships → resolve → Neo4j load. 211 entities across 7 CIDOC-CRM types, 127 relationships, all loaded into Neo4j with correct labels and backtick-escaped Cypher. Incremental saves mean crashes don't lose work. The throttle means no 429s.
+
+Still TODO:
+- Embed chunks and store them as nodes with vector indexes
+- Pre-validate Cypher against GraphLint using the SHACL file
+- Auto-generate SHACL from an ontology
+- Option to use Neo4j Graph Types rather than SHACL
+- Auto-scope downstream pipeline steps to current PDFs in `data/pdf/`
