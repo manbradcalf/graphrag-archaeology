@@ -299,7 +299,7 @@ va:EventShape a sh:NodeShape ;
     sh:property [
         sh:path crm:P8_took_place_on_or_within ;
         sh:nodeKind sh:IRI ;
-        sh:class crm:E53_Place ;
+        sh:or ( [ sh:class crm:E53_Place ] [ sh:class crm:E27_Site ] ) ;
         sh:minCount 1 ;
         sh:severity sh:Violation ;
         rdfs:comment "Event must be linked to at least one location (Site or Place)"
@@ -320,7 +320,7 @@ va:EventShape a sh:NodeShape ;
     sh:property [
         sh:path crm:P11_had_participant ;
         sh:nodeKind sh:IRI ;
-        sh:class crm:E21_Person ;
+        sh:or ( [ sh:class crm:E21_Person ] [ sh:class crm:E74_Group ] ) ;
         rdfs:comment "Person(s) or group(s) that participated in the event"
     ] ;
 
