@@ -18,7 +18,7 @@ The pipeline does **not** yet embed chunks or create vector indexes for semantic
 
 - Pre-validate Cypher queries against GraphLint using the same SHACL file
 - Store text chunks as nodes with embeddings for hybrid graph + vector search
-- Auto-generate SHACL files from an ontology
+- Guided ontology → SHACL wizard ([manbradcalf/graphlint#3](https://github.com/manbradcalf/graphlint/issues/3))
 - Option to use Neo4j Graph Types rather than SHACL
 
 ## Tech Stack
