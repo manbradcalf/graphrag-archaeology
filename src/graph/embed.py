@@ -240,7 +240,8 @@ def create_vector_indexes(driver: Driver) -> None:
     # one index per SHACL type that is likely to be searched.
     for label in ENTITY_TYPES:
         escaped = f"`{label}`" if "-" in label else label
-        index_name = f"{label.lower()}_embedding"
+        raw_index_name = f"{label.lower()}_embedding"
+        index_name = f"`{raw_index_name}`" if "-" in label else raw_index_name
         driver.execute_query(
             f"CREATE VECTOR INDEX {index_name} IF NOT EXISTS "
             f"FOR (n:{escaped}) ON (n.embedding) "
