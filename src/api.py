@@ -61,6 +61,11 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 
 
+class EmbedRequest(BaseModel):
+    text: str | list[str]
+    prefix: str = "search_query"  # "search_query" or "search_document"
+
+
 class QueryRequest(BaseModel):
     filters: list[str] | None = None
     question: str | None = None
@@ -84,6 +89,21 @@ async def health():
         return {"status": "healthy", "neo4j": "connected"}
     except Exception as e:
         return {"status": "degraded", "neo4j": str(e)}
+
+
+@app.post("/embed-locally")
+async def embed(request: EmbedRequest):
+    """Generate embeddings using the local nomic model."""
+    from src.graph.embed import embed_query, embed_texts
+
+    if isinstance(request.text, str):
+        prefix = f"{request.prefix}: "
+        vec = embed_texts([request.text], prefix=prefix)[0]
+        return {"embedding": vec, "dimensions": len(vec)}
+
+    prefix = f"{request.prefix}: "
+    vecs = embed_texts(request.text, prefix=prefix)
+    return {"embeddings": vecs, "count": len(vecs), "dimensions": len(vecs[0])}
 
 
 @app.get("/entities")
