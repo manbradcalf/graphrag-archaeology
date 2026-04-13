@@ -57,7 +57,7 @@ OPENAI_API_KEY: str = _env("OPENAI_API_KEY", default="")
 # ---------------------------------------------------------------------------
 NEO4J_URI: str = _env("NEO4J_URI", default="bolt://localhost:7687")
 NEO4J_USERNAME: str = _env("NEO4J_USERNAME", default="neo4j")
-NEO4J_PASSWORD: str = _env("NEO4J_PASSWORD", default="password")
+NEO4J_PASSWORD: str = _env("NEO4J_PASSWORD", default="Password1")
 NEO4J_DATABASE: str = _env("NEO4J_DATABASE", default="neo4j")
 
 # ---------------------------------------------------------------------------
